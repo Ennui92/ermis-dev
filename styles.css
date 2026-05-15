@@ -400,5 +400,23 @@ main.post article a:focus-visible {
   border-radius: 0 12px 12px 0;
 }
 
+.post-disclaimer {
+  margin: 24px 0 8px;
+  padding: 16px 20px;
+  background: var(--pill-bg);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.post-disclaimer p { margin: 0; }
+
+.post-disclaimer strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
 /* Posts index page */
 main .post-back { margin-bottom: 16px; }
