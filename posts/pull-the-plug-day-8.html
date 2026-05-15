@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 8 of building a game I don't know how to build — Ermis Zacharopoulos</title>
+<meta name="description" content="Diary post from day 8 of building Pull the Plug, a 2D vector platformer where I direct and Claude does the typing.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:title" content="Day 8 of building a game I don't know how to build">
+<meta property="og:description" content="Diary post from day 8 of building Pull the Plug, a 2D vector platformer where I direct and Claude does the typing.">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://ermis.dev/assets/posts/pull-the-plug-overview.png">
+<meta property="og:url" content="https://ermis.dev/posts/pull-the-plug-day-8.html">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<main class="post">
+  <p class="post-back"><a href="../#posts">&larr; Posts</a></p>
+
+  <article>
+    <header class="post-head">
+      <p class="post-meta">15 May 2026 &middot; Diary</p>
+      <h1>Day 8 of building a game I don't know how to build</h1>
+      <p class="post-lede">Quick update on the side project. I started a 2D vector platformer called Pull the Plug. It is day 8 and you can play it in a browser, on your phone, right now, at <a href="https://pull-the-plug.feepok.workers.dev" target="_blank" rel="noopener">pull-the-plug.feepok.workers.dev</a>. Three missions, a working narrator, ambient audio that reacts to where you stand. I am not coding it. Claude is doing the typing. I am directing.</p>
+    </header>
+
+    <figure class="post-figure post-figure-wide">
+      <img src="../assets/posts/pull-the-plug-overview.png" alt="Mission 1 overview: the whole horizontal level laid out left-to-right, from the dock and reception on the ground to the breaker room high up on the right." loading="lazy">
+      <figcaption>Mission 1, in one shot. You start bottom left, you finish top right. The flycam UI in the corner is a dev tool I'll talk about later.</figcaption>
+    </figure>
+
+    <p>This is a diary post about what has happened so far, mostly so I can come back later and remember. There is no list of takeaways at the bottom. I am still in the middle of it.</p>
+
+    <h2>What it is</h2>
+    <p>One-button vertical platformer. You climb up six pieces of AI infrastructure, one mission each, and pull the plug at the top. Calm narrator the whole time who does not want you to do this and has reasons. Around mission four the calm starts to crack. That is the idea.</p>
+    <p>Two rules I locked on day one and refuse to renegotiate:</p>
+    <ol>
+      <li>The jump has to feel perfect. If the jump is mid, everything else is wasted.</li>
+      <li>The narrator is the moat. Generic narrator, generic game.</li>
+    </ol>
+    <p>Everything else can move.</p>
+
+    <h2>The engine</h2>
+    <p>Godot 4 with GDScript. The reasoning, written down on day one so I cannot second-guess it later: free, no royalties, GDScript is Python-ish so Claude writes clean code in it, it is vector-native which matches the art direction, and it exports to web, Windows, iOS, Android out of one codebase. The web export is what closed it. Within a week the game was running on my phone at a public URL. Every git push triggers a deploy in about 30 seconds. I send the link to a friend, they play it, they tell me what is broken. The loop is short.</p>
+
+    <figure class="post-figure">
+      <img src="../assets/posts/pull-the-plug-z1.png" alt="The opening of Mission 1: a small hooded figure on the left, a 'WELCOME' sign, 'HOW TO MOVE' instructions, a forklift in front of a reception desk, and the tall lobby tower silhouette in the distance." loading="lazy">
+      <figcaption>The opening. Welcome sign, controls cheat-sheet, and a tiny hooded player about to walk into a building that does not want to be unplugged.</figcaption>
+    </figure>
+
+    <h2>The thing that cost me a week</h2>
+    <p>Early on Claude would write platform positions and I would have no idea if they were right. "Z2 Climb C at x=8920, y=460." Cool. Is that on screen. Will the player reach it. Are the lasers in front of the wall or behind it. I would commit, push, refresh the game on my phone, and find a platform floating above the camera or two of them stacked into one or a laser clipping through the landing zone.</p>
+    <p>The fix is dumb in hindsight. Two rules: screenshot the current state before changing geometry, screenshot the new state after. Then actually look at them. I also built a fly camera autoload. Press F to fly around. Press 0 to see the whole mission. Press 1 through 7 to jump to zones. Gameplay pauses while you fly so you can wander without dying.</p>
+    <p>Now Claude takes the screenshots, reads them back, and tells me what looks wrong before we commit. This should have been step one. I lost about a week to "Claude said the platform was there but it wasn't."</p>
+
+    <h2>How the art happened</h2>
+    <p>I cannot draw either, so art was always going to be assembled.</p>
+    <p>First I dropped in Kenney asset packs. Free, clean, vector and pixel sets. Made the game look like a Godot tutorial.</p>
+    <p>Then I started using Recraft V4, an AI image tool that outputs SVG instead of PNG. Same prompt suffix every time: pure black silhouette, flat vector, no facial features, inspired by Alto's Odyssey and Inside. Got 11 silhouettes for about 210 credits. Player in a hood, a fan housing, a separate fan blade, grates, skyline pieces. The fan was the funny one. Once the housing and blade were separate SVGs, the housing stopped wobbling when the blade spun. A bug I had been ignoring for days just vanished.</p>
+
+    <figure class="post-figure">
+      <img src="../assets/posts/pull-the-plug-z2.png" alt="Zone 2 and 3 of Mission 1: a stack of industrial silhouettes against a deep blue night sky, cooling pipes, signage labels, and the start of a climb upward." loading="lazy">
+      <figcaption>Zone 2 going into Zone 3. Pure silhouette plane, raster background, everything in the same colour family.</figcaption>
+    </figure>
+
+    <p>Then I locked something I called the Three Plane Rule. Background plane gets desaturated raster props. Gameplay plane stays flat vector. UI plane is its own world. The second I mixed Kenney pixel props with silhouettes on the same plane, the game looked like a yard sale.</p>
+    <p>Then I did a thing I regret a little. I spent about a dollar on FAL Recraft V3 painterly mode, generating 22 full backdrops for Mission 2. Individually the images were beautiful. Composed together in a scene they looked like wallpaper. Every backdrop had its own internal composition fighting whatever silhouette I tried to put in front of it.</p>
+    <p>I scrapped them. Told Claude, screw image generation for backdrops, rebuild this in Polygon2D and lights. One session later Mission 2 was rebuilt from scratch out of Godot primitives. Gradient skies, polygons for cave walls, radial light pools, particle drips and steam, hand-placed SVG silhouettes per zone. It looked roughly ten times better. Not because Polygon2D is some magic thing. Because when you hand-place every shape, every shape knows what every other shape is doing. The AI backdrops just did not know about each other.</p>
+
+    <h2>The character I deleted</h2>
+    <p>I had three pixel character rigs from an itch pack. Homeless 1, 2, 3. I wanted a painterly fourth to A/B against them. Ran Homeless 3 through fal-ai with the painterly Recraft V3 prompt, generated 46 source files, built a sprite sheet, wired it up, pressed C in the elevator to cycle to slot 4.</p>
+    <p>It looked like a tourist standing next to the other three. Not because painterly art is bad. Because painterly did not match the contour language of the other rigs. So I deleted it. 20 sheets, 46 source files, the whole FAL character pilot toolchain, about 1,800 lines, gone. Default went back to Homeless 3.</p>
+    <p>That one stung because the work was real. Then the next day I vectorized Homeless 3 by hand, and Homeless 1, in the same silhouette direction as the rest of the world. Six slots in the C-cycle now, three pixel and three vector. The vector ones feel like the game. The pixel ones feel like dev tools. I will probably ship vector.</p>
+
+    <h2>The component toolkit</h2>
+    <p>This is the part I did not know to ask for on day one and it kind of emerged.</p>
+    <p>Every mechanic in the game is a <code>.tscn</code> file with exports. Drop it into a scene, set the numbers in the inspector, done. The list as of tonight, off the top of my head: Platform, Ramp, Hazard with pulse mode, CoolingFan, ElectrifiedGrate, LaserBeam, BouncePad, Conveyor, CrumblingPlatform, Rope, WindGust, PuzzleValve and PuzzleHatch, PressurePlate, SwingingCable, ZeroGZone, plus the narrator pieces. Around 15 things.</p>
+    <p>When I want a wind gust pushing the player left during a rightward leap, I open the scene, drag a WindGust into the zone, set force to 220 px per second left, set a pulse of 1.6 on and 1.0 off, save. Done. The component does the math. If a number feels wrong I do not refactor. I open the inspector and change the number.</p>
+
+    <h2>A small idea I keep using</h2>
+    <p>Every mission has an off-screen node parked at something like (-3500, -1500). It contains one of every sprite used in that mission, labeled. When I want to place a moss bush in Mission 2, I do not ask Claude for coordinates. I fly the camera over to that node, click the moss bush, hit Ctrl-D, drag it where I want. The whole class of "Claude computed the wrong coordinate" bug is just gone, because Claude is not doing placement anymore. I am.</p>
+    <p>I call it the asset palette. It is the best small idea I have had on this project.</p>
+
+    <h2>The audio surprise</h2>
+    <p>I had a Freesound API key and I figured I would drop two ambient drone tracks into each mission. Drone under, slow piano on top, very Sakamoto. That worked. The missions sounded the same as each other.</p>
+    <p>So I tried something else. One AudioStreamGenerator per mission, composing four to five voices at once in a per-frame loop. Mission 1 gets rain hiss, drone, HVAC, server fan whine, electric crackle. Mission 2 is sub-bass rumble, drips, hiss, flood bubbles, steam. Mission 3 has mains hum, pylon wind, arc crackle, distant transformer zap. Then the mission script writes knobs into the generator per frame based on where the player is. Walk past a server fan, the fan whine goes up. Walk near a grate, crackle density jumps. In Mission 2 the flood bubbles grow as the water rises during the climax.</p>
+    <p>It is not music. It is environment. You can stand in one corner of Mission 1 and hear a different room than if you stand in another. I did not know this was something I could ask for until I asked.</p>
+
+    <h2>The narrator</h2>
+    <p>This is the part I am still scared of.</p>
+    <p>The narrator currently shows pre-baked text. The Mission 2 lines took a full session to nail because the rule is the narrator is paternal and disappointed, never threatening, never sarcastic. The player has to feel that without being told.</p>
+    <p>Sample line, the moment you reach the master valve:</p>
+    <blockquote class="post-quote">Slowly, now. Both hands. The cities upstairs are about to notice.</blockquote>
+
+    <figure class="post-figure">
+      <img src="../assets/posts/pull-the-plug-z5.png" alt="Zone 5: a dark security area with green code text scrolling on a screen, leading up into a small purple-lit breaker room labeled 'MASTER BREAKER'." loading="lazy">
+      <figcaption>End of Mission 1. The master breaker, lit warm against the dark. This is where the narrator stops being polite.</figcaption>
+    </figure>
+
+    <p>What I have not built yet is the live LLM and TTS pipeline. ElevenLabs voice, a Cloudflare Worker calling Claude per beat. The architecture is sketched, the autoload exists with a placeholder, but I have not pulled the trigger because every beat costs real money and I want pre-baked content across every mission first, before I start paying per test. Mission 2 still has zero narrator triggers across seven zones. The narrator is the whole moat and one mission is silent. That is a hole.</p>
+
+    <h2>What's next</h2>
+    <p>Tomorrow is an end-to-end playtest on the live deployment. Walk every mission, listen to whether the procedural audio actually sounds different across the three or whether it has all averaged out, check whether the new components I shipped overnight are even discoverable without help.</p>
+    <p>Then probably Mission 2 narrator beats, because the silence there is louder than anything else.</p>
+    <p>The live LLM pipeline, maybe. I keep finding reasons to delay it. Some of them are good.</p>
+    <p>That is day 8. If you want to try it, the link is <a href="https://pull-the-plug.feepok.workers.dev" target="_blank" rel="noopener">at the top</a>. If something feels broken, tell me, because that is how I find out.</p>
+  </article>
+
+  <footer>
+    <ul class="socials">
+      <li><a href="../">&larr; ermis.dev</a></li>
+      <li><a href="https://www.linkedin.com/in/ermis-zacharopoulos-2819968b/" target="_blank" rel="noopener">LinkedIn</a></li>
+      <li><a href="https://github.com/Ennui92" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <p class="meta">Ermis Zacharopoulos &middot; Berlin</p>
+  </footer>
+</main>
+</body>
+</html>
