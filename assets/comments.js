@@ -17,9 +17,15 @@
   const form = section.querySelector("#comment-form");
   const nameInput = section.querySelector("#comment-name");
   const bodyInput = section.querySelector("#comment-body");
+  const websiteInput = section.querySelector("#comment-website");
   const counter = section.querySelector("#comment-counter");
   const status = section.querySelector("#comment-status");
   const submit = section.querySelector("#comment-submit");
+
+  // Stamp the moment the form became visible so the server can reject
+  // submissions that come in under MIN_FORM_AGE_MS (script-driven submits
+  // are usually <500ms; humans take seconds to type).
+  const formMountedAt = Date.now();
 
   const fmt = new Intl.DateTimeFormat("en", {
     day: "numeric", month: "short", year: "numeric",
@@ -115,6 +121,8 @@
           name: nameInput.value,
           body,
           turnstileToken: token,
+          website: websiteInput ? websiteInput.value : "",
+          formAgeMs: Date.now() - formMountedAt,
         }),
       });
       const data = await res.json().catch(() => ({}));

@@ -146,6 +146,12 @@
     </ul>
 
     <form class="comment-form" id="comment-form" novalidate>
+      <!-- Honeypot: humans never see this; bots fill it in. Server rejects any submission with a value. -->
+      <div class="comment-honeypot" aria-hidden="true">
+        <label for="comment-website">Website (leave blank)</label>
+        <input type="text" id="comment-website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
       <div class="comment-field">
         <label for="comment-name">Name <span class="comment-hint">(optional)</span></label>
         <input type="text" id="comment-name" name="name" maxlength="40" autocomplete="off" placeholder="Anonymous">

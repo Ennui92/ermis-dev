@@ -21,6 +21,14 @@ const POST_ID_RE = /^[a-z0-9][a-z0-9-]{0,79}$/i;
 const LINK_RE =
   /\bhttps?:\/\/|<a\b|\bwww\.[a-z0-9]|[a-z0-9-]{2,}\.(com|net|org|io|dev|app|co|me|xyz|gg|ai|tv|us|uk|de|fr|ru|cn|info|biz|tech|site|online|store|shop|link|click|live|fun|top|wtf|sh|to)\b/i;
 
+// Anti-spam layers stacked on top of Turnstile so the system has teeth
+// even while the captcha widget is using Cloudflare's always-pass test
+// keys. Each layer is cheap; together they catch the bulk of script
+// kiddies, automated scrapers, and brute-force comment spam.
+const MIN_FORM_AGE_MS = 1500;          // form must be open this long before submit
+const RATE_LIMIT_WINDOW_S = 300;       // 5-minute sliding window
+const RATE_LIMIT_MAX = 5;              // max posts per IP in the window
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -76,6 +84,24 @@ async function handlePost(request, env, cors) {
     return json({ error: "bad json" }, 400, cors);
   }
 
+  // ── Honeypot ─────────────────────────────────────────────────────────
+  // The form has a hidden `website` field that humans never see and
+  // bots fill in automatically. If it has any value, it's a bot.
+  // We respond 200 OK to avoid signaling rejection (so the bot doesn't
+  // retry with a different strategy), but skip the KV write.
+  if (payload.website && String(payload.website).trim().length > 0) {
+    return json({ comment: { id: "honey", name: "Anonymous", body: "", ts: Date.now() } }, 200, cors);
+  }
+
+  // ── Form-age gate ────────────────────────────────────────────────────
+  // The frontend stamps a timestamp when the page loads and sends the
+  // elapsed milliseconds at submit time. Sub-1.5s submissions are
+  // overwhelmingly bots (humans can't fill and submit that fast).
+  const formAgeMs = Number(payload.formAgeMs);
+  if (!Number.isFinite(formAgeMs) || formAgeMs < MIN_FORM_AGE_MS) {
+    return json({ error: "submitted too fast, please retry" }, 400, cors);
+  }
+
   const postId = String(payload.postId || "");
   if (!POST_ID_RE.test(postId)) {
     return json({ error: "bad postId" }, 400, cors);
@@ -92,6 +118,20 @@ async function handlePost(request, env, cors) {
     return json({ error: "no links allowed in comments" }, 400, cors);
   }
 
+  // ── Per-IP rate limit ────────────────────────────────────────────────
+  // Sliding window of N posts per 5 minutes. Each post writes a KV
+  // entry under `rl:<ip>:<ts>` with TTL = window. Counting matching
+  // entries gives the rolling count without needing to manage expiry
+  // ourselves.
+  const ip = request.headers.get("CF-Connecting-IP") || "0.0.0.0";
+  if (ip !== "0.0.0.0") {
+    const rl = await env.COMMENTS_KV.list({ prefix: `rl:${ip}:`, limit: RATE_LIMIT_MAX + 1 });
+    if (rl.keys.length >= RATE_LIMIT_MAX) {
+      return json({ error: "too many comments, please slow down" }, 429, cors);
+    }
+  }
+
+  // ── Turnstile (test key always passes; real key on swap-in) ─────────
   const token = String(payload.turnstileToken || "");
   if (!token) return json({ error: "captcha missing" }, 400, cors);
 
@@ -103,7 +143,7 @@ async function handlePost(request, env, cors) {
       body: new URLSearchParams({
         secret: env.TURNSTILE_SECRET,
         response: token,
-        remoteip: request.headers.get("CF-Connecting-IP") || "",
+        remoteip: ip,
       }),
     }
   );
@@ -113,6 +153,16 @@ async function handlePost(request, env, cors) {
   }
 
   const ts = Date.now();
+
+  // Stamp the rate-limit key (TTL auto-expires it after the window).
+  if (ip !== "0.0.0.0") {
+    await env.COMMENTS_KV.put(
+      `rl:${ip}:${ts}`,
+      "",
+      { expirationTtl: RATE_LIMIT_WINDOW_S }
+    );
+  }
+
   // Sortable suffix: invert ts so list() (lexicographic) returns newest first,
   // but we still sort client-side to be safe.
   const id = `c:${postId}:${ts}-${crypto.randomUUID().slice(0, 8)}`;

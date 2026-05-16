@@ -584,6 +584,17 @@ main .post-back { margin-bottom: 16px; }
   min-height: 65px;
 }
 
+/* Honeypot: positioned off-screen so humans never see/tab to it.
+   Bots fill it; server rejects any submission with a value. */
+.comment-honeypot {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 .comment-actions {
   display: flex;
   align-items: center;
