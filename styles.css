@@ -420,3 +420,50 @@ main.post article a:focus-visible {
 
 /* Posts index page */
 main .post-back { margin-bottom: 16px; }
+
+/* ---------- COMMENTS ---------- */
+
+.comments {
+  margin: 64px 0 0;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+}
+
+.comments h2 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-variation-settings: "opsz" 36;
+  font-size: 1.45rem;
+  letter-spacing: -0.012em;
+  margin: 0 0 8px;
+  color: var(--text);
+}
+
+.comments-intro {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-family: var(--serif);
+  font-style: italic;
+}
+
+.comments-fallback {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+#cusdis_thread {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow-soft);
+  min-height: 120px;
+}
+
+#cusdis_thread iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+}
