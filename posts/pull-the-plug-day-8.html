@@ -114,21 +114,41 @@
     <p>That is day 8. If you want to try it, the link is <a href="https://pull-the-plug.feepok.workers.dev" target="_blank" rel="noopener">at the top</a>. If something feels broken, tell me, because that is how I find out.</p>
   </article>
 
-  <section class="comments" aria-labelledby="comments-heading">
+  <section class="comments" aria-labelledby="comments-heading" data-post-id="pull-the-plug-day-8">
     <h2 id="comments-heading">Comments</h2>
-    <p class="comments-intro">Leave a note below. Anonymous is fine. A small captcha keeps the bots out.</p>
-    <div id="cusdis_thread"
-         data-host="https://cusdis.com"
-         data-app-id="d713f175-bc41-43a0-a64d-aedba96838f1"
-         data-page-id="pull-the-plug-day-8"
-         data-page-url="https://ermis.dev/posts/pull-the-plug-day-8.html"
-         data-page-title="Day 8 of building a game I don't know how to build">
-    </div>
-    <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+    <p class="comments-intro">Anyone can post. Captcha keeps the bots out. No links allowed.</p>
+
+    <ul class="comment-list" id="comment-list" aria-live="polite">
+      <li class="comment-loading">Loading comments&hellip;</li>
+    </ul>
+
+    <form class="comment-form" id="comment-form" novalidate>
+      <div class="comment-field">
+        <label for="comment-name">Name <span class="comment-hint">(optional)</span></label>
+        <input type="text" id="comment-name" name="name" maxlength="40" autocomplete="off" placeholder="Anonymous">
+      </div>
+
+      <div class="comment-field">
+        <label for="comment-body">Comment</label>
+        <textarea id="comment-body" name="body" rows="6" maxlength="800" required placeholder="Say something. No links."></textarea>
+        <p class="comment-counter"><span id="comment-counter">0</span> / 800</p>
+      </div>
+
+      <div class="cf-turnstile" data-sitekey="REPLACE_WITH_TURNSTILE_SITE_KEY" data-theme="light"></div>
+
+      <div class="comment-actions">
+        <button type="submit" id="comment-submit">Post comment</button>
+        <p class="comment-status" id="comment-status" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+
     <noscript>
-      <p class="comments-fallback">Comments need JavaScript. If you'd rather not run it, email me via the link in the footer.</p>
+      <p class="comments-fallback">Comments need JavaScript. Email me via the link in the footer instead.</p>
     </noscript>
   </section>
+
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="../assets/comments.js" defer></script>
 
   <footer>
     <ul class="socials">

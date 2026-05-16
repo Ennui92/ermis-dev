@@ -1,0 +1,18 @@
+name = "ermis-comments"
+main = "src/worker.js"
+compatibility_date = "2026-05-01"
+
+# KV namespace for comment storage. Create with:
+#   npx wrangler kv namespace create COMMENTS_KV
+# then paste the returned id into the `id` field below.
+[[kv_namespaces]]
+binding = "COMMENTS_KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+# Turnstile secret is set via:
+#   npx wrangler secret put TURNSTILE_SECRET
+# (it asks for the value interactively — paste the secret key from the
+# Cloudflare Turnstile dashboard, NOT the site key).
+
+[observability]
+enabled = true
