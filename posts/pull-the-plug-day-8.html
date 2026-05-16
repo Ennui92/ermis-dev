@@ -107,6 +107,29 @@
 
     <p>What I have not built yet is the live LLM and TTS pipeline. ElevenLabs voice, a Cloudflare Worker calling Claude per beat. The architecture is sketched, the autoload exists with a placeholder, but I have not pulled the trigger because every beat costs real money and I want pre-baked content across every mission first, before I start paying per test. Mission 2 still has zero narrator triggers across seven zones. The narrator is the whole moat and one mission is silent. That is a hole.</p>
 
+    <h2>The dev tools that paid for themselves</h2>
+    <p>A pile of one-key shortcuts has done more for my speed than any single design decision. None of these were on day-one plans. They all started as "ugh, I keep doing this by hand" and turned into 50 lines of code that I now cannot live without. In rough order of how often I press them:</p>
+
+    <p><strong>F to fly.</strong> Press F in any running mission and the camera detaches from the player. Gameplay pauses. WASD pans, Shift goes fast, wheel zooms, Z resets. Press 0 and the whole 9000 by 2200 map fits on one screen. Press 1 through 5 to frame a specific zone. I built this the day I realized I was scrolling for thirty seconds just to look at a thing.</p>
+
+    <p><strong>G for god mode.</strong> Same idea but inside gameplay. Press G and the player no-clips through walls, ignores gravity, ignores hazards, ignores death. Fly with WASD, press G again to drop back into normal physics wherever you are. I do not playtest without it on anymore. The amount of time I used to spend dying my way to the bug is embarrassing.</p>
+
+    <p><strong>K drops a checkpoint.</strong> Stand somewhere in a running mission, press K, a checkpoint instantiates at that position AND a new line gets written into the mission's .tscn file so it persists. No editor toggle, no copy-pasting coordinates from a debug print. Once this existed, I stopped designing checkpoint placement by reading numbers. I walk the level and tap K when it feels right.</p>
+
+    <p><strong>P shoots a screenshot.</strong> Auto-numbered, never overwrites, dumped into a folder Claude can read directly. The workflow that fell out of this is the one I keep recommending to people: take five or six shots through a zone in one playthrough, then ask Claude to look at "the last five" and tell me what looks off. Way faster than the alternative, which is Claude taking its own screenshot, sending it, me reading the response, asking for the next, repeat. Batching feedback was the unlock.</p>
+
+    <p><strong>C cycles characters.</strong> Six slots. Three pixel rigs from the asset pack, three I vectorized to match the silhouette language. Useful when I want to A/B which one feels like it belongs in the world. Spoiler, it is not the pixel ones.</p>
+
+    <p><strong>A CMS for the narrator.</strong> A tiny offline HTML page that lists every narrator line in the game, grouped by mission, with status pills. LIVE means it is in the game and approved. SACRED means I refuse to renegotiate it. MISSING means there is a designed beat and no text yet. ZERO is the screaming-red dashed-border one, meaning a whole zone has no narrator at all. I use it to know what to write next, and to remember why a line cannot change.</p>
+
+    <p><strong>A custom Claude skill for parallax backgrounds.</strong> A skill, in this context, is a little chunk of locked rules and references that Claude reads automatically when the task matches. I made one called <code>godot-2d-parallax-background</code>. It knows the palette and scroll axis of every mission and zone in the game. I type "design M3 Z2" and out comes a scene scaffold with the right motion_scale numbers, the right z_index ordering for the Three Plane Rule, an asset checklist pointing at the correct art folders, and a signature element close to camera. No interview, no re-explaining. The half-afternoon to write the skill paid back the first time I needed a new background.</p>
+
+    <p><strong>The Three Plane Rule itself.</strong> Background plane gets desaturated raster. Gameplay plane stays flat vector. UI plane is its own world. It is not a tool, it is a rule, but it functions like a tool because once it is locked, every art decision has a yes-or-no test. Mixing the planes is what made the game look like a yard sale before I locked this.</p>
+
+    <p><strong>The off-screen asset palette.</strong> Covered up there in its own section. Every mission has one. It is the thing I keep telling people about when they ask how I work with Claude on art-heavy stuff.</p>
+
+    <p>The pattern across all of these is the same. Anything I do more than twice gets a keystroke. Anything Claude asks me twice gets baked into a skill, a rule, or a reference doc. The game gets built by removing the parts of the loop where I was thinking about the loop.</p>
+
     <h2>What's next</h2>
     <p>Tomorrow is an end-to-end playtest on the live deployment. Walk every mission, listen to whether the procedural audio actually sounds different across the three or whether it has all averaged out, check whether the new components I shipped overnight are even discoverable without help.</p>
     <p>Then probably Mission 2 narrator beats, because the silence there is louder than anything else.</p>
