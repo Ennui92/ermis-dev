@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 9: today I did not build the game — Ermis Zacharopoulos</title>
+<meta name="description" content="Day 9 of building Pull the Plug. Spent the day building everything around the game: a comments box, a waitlist, a newsletter, a landing page. Also the M1 ceiling, four times.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=2026-05-16-day9">
+<meta property="og:title" content="Day 9: today I did not build the game">
+<meta property="og:description" content="Spent the day building everything around the game: a comments box, a waitlist, a newsletter, a landing page. Also the M1 ceiling, four times.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ermis.dev/posts/pull-the-plug-day-9.html">
+<meta name="twitter:card" content="summary">
+</head>
+<body>
+<main class="post">
+  <p class="post-back"><a href="../#posts">&larr; Posts</a></p>
+
+  <article>
+    <header class="post-head">
+      <p class="post-meta">16 May 2026 &middot; Diary</p>
+      <h1>Day 9: today I did not build the game</h1>
+      <p class="post-lede">Yesterday I wrote that I would start day 9 with an end-to-end playtest. I did not do that. I spent most of the day building everything that surrounds the game instead. A comments box. A landing page. A waitlist. A newsletter. The M1 ceiling, four times. The game itself is exactly where I left it last night.</p>
+    </header>
+
+    <aside class="post-disclaimer">
+      <p><strong>Same disclaimer as yesterday.</strong> Claude wrote this from my git log and my podcast voice. If something here sounds wrong or you want the actual reasoning behind it, ask me in the comments below. I will reply with my own brain.</p>
+    </aside>
+
+    <h2>How the day actually went</h2>
+    <p>I sat down expecting to playtest. Instead the first thing I noticed was that the Mission 1 ceiling looked like a flat concrete bar laid across the top of the level. Visually flat. Compositionally a wall. It bothered me enough that I redesigned it. Then I redesigned the redesign. Then a third time. Then I gave up trying to be clever and put the solid concrete back, but with the beam cuts and contour heights right this time.</p>
+    <p>Four commits on one ceiling. I tell myself this is fine because each version taught me what the next one needed. I also know I burned three hours on a thing nobody will consciously notice. Both things are true.</p>
+    <p>By the time the ceiling was done I had used up the morning. So I changed direction. If today was not going to be a game day, fine, it would be a house day. The game has been live for a week and nobody can leave a comment, nobody can subscribe, nobody can put their email in a list to be told when it ships. Time to fix that.</p>
+
+    <h2>The comments box</h2>
+    <p>Yesterday's post went live with no comments section. I had not thought about it. Today I thought about it for a minute and reached for a free hosted thing called Cusdis. Wired it in, dropped the embed code into the post, opened the page on my phone. The box rendered. I typed a comment. I pressed send. Nothing happened. No captcha, no error, no confirmation, just a small empty rectangle with my words inside it.</p>
+    <p>I tried again. I read the docs. I checked the network tab. The iframe was loading but the captcha widget inside it was not, and the submit endpoint was failing silently. After about twenty minutes of this I decided I did not want a comments product. I wanted a comments box.</p>
+    <p>So I built one. Cloudflare Worker, fifty lines of frontend JavaScript, a KV namespace, a Turnstile captcha. Anyone can post. No login. Name optional. Eight hundred character limit. Links rejected. The captcha is on the always-pass test key right now because the real one is gated behind a Cloudflare dashboard click I have not done yet, but in the meantime four other anti-spam layers do the actual work.</p>
+    <p>The four layers, in order of which one a bot trips first. Honeypot: a hidden field humans never see and bots fill out automatically. Form age: the page stamps a timestamp on load and rejects anything that posts in under one and a half seconds because nobody types that fast. Per-IP rate limit: five comments per five minutes, stored in KV with a self-expiring key. Then the captcha. Each layer is cheap. Together they catch the bulk of the spam without ever making a human do something annoying.</p>
+    <p>Total time, including the Cusdis dead end: about an hour and a half. It works, it is mine, and the only ongoing cost is the same Cloudflare worker bill of approximately zero dollars.</p>
+
+    <h2>A newsletter, apparently</h2>
+    <p>The comments box reminded me that I have no way to reach people who do read this. So I started a Substack. It is called Ermis Builds Things or something equally on-the-nose, sitting at <a href="https://ermis1.substack.com" target="_blank" rel="noopener">ermis1.substack.com</a> for now. The plan, if you can call it that, is one email every two to four weeks linking back to whatever the most interesting thing on ermis.dev was. The blog stays the destination. The newsletter is just the way I tell people the blog moved.</p>
+    <p>I picked Substack over the more dev-y options because the friction to start was the smallest. Free tier, has open-rate and subscriber-count analytics, list is exportable as a CSV if I ever want to leave. If you came here from somewhere and want to hear when something ships or breaks, the subscribe box is on the homepage now. If you did not come here for that, ignore it.</p>
+
+    <h2>The waitlist</h2>
+    <p>The other thing I built today is a small standalone landing page at <a href="../../pull-the-plug/">ermis.dev/pull-the-plug</a>. One paragraph about what the game is, two links, and an email form that drops you into a waitlist. The waitlist itself is another Cloudflare Worker. Same anti-spam stack as the comments box, plus the email gets sha256-hashed before it touches storage so a leaked KV namespace is not a leaked email list.</p>
+    <p>There is a public endpoint that returns the current count. I hit it for the first time after the deploy and it returned zero. That is a feeling. It is also the only honest signal I have so far, so I will keep watching it.</p>
+
+    <h2>The Reddit posts I have not sent</h2>
+    <p>I drafted two Reddit posts. One for r/IndieDev about the narrator hook. One for r/godot about the dev tools. They are sitting in a folder in the repo, marked <code>status: draft</code>, waiting until the comments box and the waitlist have been live long enough that I trust them not to fall over when a Reddit post lands on them.</p>
+    <p>The point of the order is that a spike of traffic on a page with no subscribe button and no waitlist is just a spike. With both forms wired in, the same spike is a hundred or so people I can email later when there is something worth saying. I would rather post on Friday with a working trapdoor than post tomorrow with a working slide.</p>
+
+    <h2>What I notice about a day like this</h2>
+    <p>If you measure today by lines of game code, the answer is approximately zero. If you measure it by the path between a stranger and the thing I am making, it is the most productive day of the project so far. Both are true and they do not feel like they are about the same thing.</p>
+    <p>The game still has no narrator in Mission 2. The live LLM pipeline is still not built. Mission 4 zero-G still has rough edges. None of that moved today. What did move is that the website around the game now behaves like a real thing. There is a place to talk back to me. There is a list to be on. There is a page that explains what I am doing without me having to type it again.</p>
+    <p>The discomfort about this is that I know which kind of day feels more productive in the moment, and it is not this one. The other kind is the one where you watch the game change shape under your hands. This one ends with a worker URL returning <code>{"count":0}</code>.</p>
+    <p>Tomorrow is supposed to be the playtest day, again. We will see.</p>
+  </article>
+
+  <section class="comments" aria-labelledby="comments-heading" data-post-id="pull-the-plug-day-9">
+    <h2 id="comments-heading">Comments</h2>
+    <p class="comments-intro">Anyone can post. Captcha keeps the bots out. No links allowed.</p>
+
+    <ul class="comment-list" id="comment-list" aria-live="polite">
+      <li class="comment-loading">Loading comments&hellip;</li>
+    </ul>
+
+    <form class="comment-form" id="comment-form" novalidate>
+      <div class="comment-honeypot" aria-hidden="true">
+        <label for="comment-website">Website (leave blank)</label>
+        <input type="text" id="comment-website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="comment-field">
+        <label for="comment-name">Name <span class="comment-hint">(optional)</span></label>
+        <input type="text" id="comment-name" name="name" maxlength="40" autocomplete="off" placeholder="Anonymous">
+      </div>
+
+      <div class="comment-field">
+        <label for="comment-body">Comment</label>
+        <textarea id="comment-body" name="body" rows="6" maxlength="800" required placeholder="Say something. No links."></textarea>
+        <p class="comment-counter"><span id="comment-counter">0</span> / 800</p>
+      </div>
+
+      <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="light"></div>
+
+      <div class="comment-actions">
+        <button type="submit" id="comment-submit">Post comment</button>
+        <p class="comment-status" id="comment-status" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+
+    <noscript>
+      <p class="comments-fallback">Comments need JavaScript. Email me via the link in the footer instead.</p>
+    </noscript>
+  </section>
+
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="../assets/comments.js?v=2026-05-16-day9" defer></script>
+
+  <footer>
+    <ul class="socials">
+      <li><a href="../">&larr; ermis.dev</a></li>
+      <li><a href="https://www.linkedin.com/in/ermis-zacharopoulos-2819968b/" target="_blank" rel="noopener">LinkedIn</a></li>
+      <li><a href="https://github.com/Ennui92" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <p class="meta">Ermis Zacharopoulos &middot; Berlin</p>
+  </footer>
+</main>
+</body>
+</html>
