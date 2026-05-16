@@ -8,7 +8,7 @@
 // block into any post and it will work, using its data-post-id.
 
 (() => {
-  const API = "https://ermis-comments.REPLACE_WITH_ACCOUNT.workers.dev/comments";
+  const API = "https://ermis-comments.feepok.workers.dev/comments";
 
   const section = document.querySelector(".comments[data-post-id]");
   if (!section) return;
