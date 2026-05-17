@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 10: a Mission 2 on paper and three tries at a drowning — Ermis Zacharopoulos</title>
+<meta name="description" content="Day 10 of building Pull the Plug. I sketched a new Mission 2 on a piece of paper, Claude built it, and then we spent three rounds figuring out why the rising water did not kill the player.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=2026-05-18-day10a">
+<meta property="og:title" content="Day 10: a Mission 2 on paper and three tries at a drowning">
+<meta property="og:description" content="I sketched a new Mission 2 on paper, Claude built it, and then we spent three rounds figuring out why the rising water did not kill the player.">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://ermis.dev/assets/posts/day-10-water-that-did-not-kill.png">
+<meta property="og:url" content="https://ermis.dev/posts/pull-the-plug-day-10.html">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<main class="post">
+  <p class="post-back"><a href="../#posts">&larr; Posts</a></p>
+
+  <article>
+    <header class="post-head">
+      <p class="post-meta">18 May 2026 &middot; Diary</p>
+      <h1>Day 10: a Mission 2 on paper and three tries at a drowning</h1>
+      <p class="post-lede">Short one today. After Day 9's firehose I wanted a slower day. I got most of one. I sketched a new Mission 2 on a piece of paper, Claude built it, and then we spent three rounds figuring out why the rising water did not kill the player when it touched him.</p>
+    </header>
+
+    <aside class="post-disclaimer">
+      <p><strong>Same disclaimer as the other days.</strong> Claude wrote this from the git log and a directing pass from me.</p>
+    </aside>
+
+    <h2>Mission 2 on paper</h2>
+    <p>I pulled out a pen and drew the layout. Vertical pit. A zig-zag of platforms coming down from the top. A three-player-wide gap halfway down that you have to thread between two hazards. Two pendulum platforms swinging over the water at the bottom. A lever in the bottom-right corner. Pull the lever, the flood starts, you race up an escape climb on the right or you drown.</p>
+    <p>I handed Claude the photo and said: <strong>build this alongside the current Mission 2, not on top of it</strong>. I want both files in the repo so I can keep iterating without losing what works. One session later there was an <code>M2_Pit.tscn</code> next to <code>M2_Veins.tscn</code>, the lever fired the flood, the water rose. The shape of the room matched the drawing close enough that I could play it.</p>
+    <p>This is becoming a pattern. I sketch. Claude implements. While Claude implements I sketch the next thing. The version control means nothing in the old file is at risk while the new file exists, so there's no "be careful" tax on the experiment. Two of the day's commits happened while I was on a separate piece of paper.</p>
+
+    <h2>The water that did not kill</h2>
+    <p>First play of the new pit: I pulled the lever, ran to the climb, and watched the water rise calmly past my feet, past my waist, past my head, while my character continued to stand there breathing.</p>
+
+    <figure class="post-figure post-figure-wide">
+      <img src="../assets/posts/day-10-water-that-did-not-kill.png" alt="A frame from Mission 2: the player is standing on the floor of the pit, the rising water is up past his shoulders, the SURFACE label and the escape platform are visible above, and the player is not dying." loading="lazy">
+      <figcaption>The bug, in one frame. The player is at the bottom of the pit, the water is at chest height, the SURFACE marker and the climb exit are above. He should be dead. He is not.</figcaption>
+    </figure>
+
+    <p>The reason was boring. The water is a Godot Area2D and the lethal signal is <code>body_entered</code>, which fires the instant a body crosses INTO the area. The flood was growing the area UPWARD through a body that was already standing still. From Godot's point of view the player never entered anything. The player was always there. The area just got bigger around him.</p>
+    <p>The first fix was to poll the area's overlapping bodies every frame. That returned nothing, because the size setter on the hazard rebuilds the collision shape on every tween frame, and the physics server cannot keep up with a shape that gets recreated 60 times a second. <strong>The fix that worked was to throw the physics engine out of it entirely.</strong> Compare the player's Y coordinate to the water's top edge each frame. If the player is at or below the surface and inside the horizontal span of the pool, call <code>die()</code>. No signals, no overlap, no shape. Geometry.</p>
+
+    <h2>The death loop</h2>
+    <p>Then the second bug. I pulled the lever, climbed half the escape shaft, missed a jump, drowned, respawned at the climb checkpoint... <em>under water</em>. The checkpoint is at a fixed Y. After about seven seconds of flood the water sits above that Y. Respawning into it killed me again. Then again. Then again.</p>
+    <p>Two ways to fix this. Move the checkpoint above the water's top. Or reset the flood when the player dies. I went with the reset. Added a <code>died</code> signal to the player. Mission 2 listens. When it fires during a flood, the script snaps the water back to its starting position and restarts the rising tween from zero. You respawn dry, with twenty seconds on the clock again. Clean retry. A clean retry was the whole point of putting a checkpoint there.</p>
+
+    <h2>Two small things that saved me an hour</h2>
+    <p>Both of these are dev quality-of-life and neither was on today's plan, but they came up and they are sticking.</p>
+    <p>The mission-end card. Every time I opened a mission scene in the editor today, a giant orange "MISSION 1 COMPLETE" panel sat in the middle of the screen, covering the level I was trying to edit. The card hides itself at runtime via an alpha tween, but the editor never runs the script that hides it. So in the editor it was always on. Fix: ship the scene with the whole layer set to invisible, and turn it visible at runtime instead. Half a line. Made the editor usable again.</p>
+    <p>The bigger one is the refresh script. After every commit I run a shell command that kills the old game window and launches a fresh build. It always launched into the Prelude scene. Which is a two-minute cinematic walk before you reach the first mission. <strong>I was sitting through that walk thirty times a day.</strong> I added a <code>--scene</code> flag that remembers which mission I am testing and persists it to a file. Now every refresh boots straight into Mission 2 Pit. The first refresh that did it I laughed out loud at my desk.</p>
+
+    <h2>End to end</h2>
+    <p>The last commit of the day was four characters long. Mission 1's master switch was still pointing at the archived Mission 2 backdrop. I retargeted it at <code>M2_Pit.tscn</code> and saved. The whole chain is wired again. Prelude into Mission 1 into the new Mission 2 into Mission 3 into Mission 4 into the elevator. You can sit down and play all of it in one go.</p>
+    <p>Tomorrow is not promised to anyone. The narrator beats for the new Mission 2 are not written. The pendulum platforms swing but they do not really feel like pendulums yet. The water is blue and wavy but it could be more menacing. There's a list. I'll know which one I pick when I sit down.</p>
+  </article>
+
+  <nav class="post-nav" aria-label="Post navigation">
+    <a class="post-nav-prev" href="pull-the-plug-day-9.html">
+      <span class="post-nav-label">&larr; Previous</span>
+      <span class="post-nav-title">Day 9: forty-six commits and a memory rule</span>
+    </a>
+    <a class="post-nav-index" href="./">All posts</a>
+  </nav>
+
+  <section class="comments" aria-labelledby="comments-heading" data-post-id="pull-the-plug-day-10">
+    <h2 id="comments-heading">Comments</h2>
+    <p class="comments-intro">Anyone can post. Captcha keeps the bots out. No links allowed.</p>
+
+    <ul class="comment-list" id="comment-list" aria-live="polite">
+      <li class="comment-loading">Loading comments&hellip;</li>
+    </ul>
+
+    <form class="comment-form" id="comment-form" novalidate>
+      <div class="comment-honeypot" aria-hidden="true">
+        <label for="comment-website">Website (leave blank)</label>
+        <input type="text" id="comment-website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="comment-field">
+        <label for="comment-name">Name <span class="comment-hint">(optional)</span></label>
+        <input type="text" id="comment-name" name="name" maxlength="40" autocomplete="off" placeholder="Anonymous">
+      </div>
+
+      <div class="comment-field">
+        <label for="comment-body">Comment</label>
+        <textarea id="comment-body" name="body" rows="6" maxlength="800" required placeholder="Say something. No links."></textarea>
+        <p class="comment-counter"><span id="comment-counter">0</span> / 800</p>
+      </div>
+
+      <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="light"></div>
+
+      <div class="comment-actions">
+        <button type="submit" id="comment-submit">Post comment</button>
+        <p class="comment-status" id="comment-status" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+
+    <noscript>
+      <p class="comments-fallback">Comments need JavaScript. Email me via the link in the footer instead.</p>
+    </noscript>
+  </section>
+
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="../assets/comments.js?v=2026-05-18-day10" defer></script>
+
+  <footer>
+    <ul class="socials">
+      <li><a href="../">&larr; ermis.dev</a></li>
+      <li><a href="https://www.linkedin.com/in/ermis-zacharopoulos-2819968b/" target="_blank" rel="noopener">LinkedIn</a></li>
+      <li><a href="https://github.com/Ennui92" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <p class="meta">Ermis Zacharopoulos &middot; Berlin</p>
+  </footer>
+</main>
+</body>
+</html>
