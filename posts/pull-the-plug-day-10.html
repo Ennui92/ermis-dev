@@ -29,33 +29,27 @@
     </header>
 
     <aside class="post-disclaimer">
-      <p><strong>Same disclaimer as the other days.</strong> Claude wrote this from the git log and a directing pass from me.</p>
+      <p><strong>Small disclaimer before you read.</strong> I wanted to document this experiment, but I do not have the time to write or remember everything after so many days. So I asked Claude to put these notes together using the tone of voice it could pick up from my podcast. It did okay-ish. Read at your own risk. If you have questions about any of this, ask me and I promise to answer with my actual brain.</p>
+    </aside>
+
+    <aside class="post-tldr">
+      <p><strong>TL;DR.</strong> Drew a new Mission 2 on a piece of paper, handed Claude the photo, and got a playable version that same evening. The water that's supposed to drown the player did not, because of a Godot quirk I had never thought about. The whole game now plays end to end again: Prelude into Mission 1, into the new Mission 2, into Mission 3, into Mission 4, into the elevator.</p>
     </aside>
 
     <h2>Mission 2 on paper</h2>
-    <p>I pulled out a pen and drew the layout. Vertical pit. A zig-zag of platforms coming down from the top. A three-player-wide gap halfway down that you have to thread between two hazards. Two pendulum platforms swinging over the water at the bottom. A lever in the bottom-right corner. Pull the lever, the flood starts, you race up an escape climb on the right or you drown.</p>
+    <p>I pulled out a pen and drew the layout. Vertical pit. A zig-zag of platforms coming down. A three-player-wide gap halfway down to thread between two hazards. Two pendulum platforms swinging over the water at the bottom. A lever in the bottom-right corner. Pull the lever, the flood starts, you race up an escape climb on the right or you drown.</p>
     <p>I handed Claude the photo and said: <strong>build this alongside the current Mission 2, not on top of it</strong>. I want both files in the repo so I can keep iterating without losing what works. One session later there was an <code>M2_Pit.tscn</code> next to <code>M2_Veins.tscn</code>, the lever fired the flood, the water rose. The shape of the room matched the drawing close enough that I could play it.</p>
     <p>This is becoming a pattern. I sketch. Claude implements. While Claude implements I sketch the next thing. The version control means nothing in the old file is at risk while the new file exists, so there's no "be careful" tax on the experiment. Two of the day's commits happened while I was on a separate piece of paper.</p>
 
     <h2>The water that did not kill</h2>
-    <p>First play of the new pit: I pulled the lever, ran to the climb, and watched the water rise calmly past my feet, past my waist, past my head, while my character continued to stand there breathing.</p>
+    <p>First play of the new pit: I pulled the lever, ran to the climb, and watched the water rise calmly past my feet, past my waist, past my head, while my character stood there breathing.</p>
 
     <figure class="post-figure post-figure-wide">
       <img src="../assets/posts/day-10-water-that-did-not-kill.png" alt="A frame from Mission 2: the player is standing on the floor of the pit, the rising water is up past his shoulders, the SURFACE label and the escape platform are visible above, and the player is not dying." loading="lazy">
       <figcaption>The bug, in one frame. The player is at the bottom of the pit, the water is at chest height, the SURFACE marker and the climb exit are above. He should be dead. He is not.</figcaption>
     </figure>
 
-    <p>The reason was boring. The water is a Godot Area2D and the lethal signal is <code>body_entered</code>, which fires the instant a body crosses INTO the area. The flood was growing the area UPWARD through a body that was already standing still. From Godot's point of view the player never entered anything. The player was always there. The area just got bigger around him.</p>
-    <p>The first fix was to poll the area's overlapping bodies every frame. That returned nothing, because the size setter on the hazard rebuilds the collision shape on every tween frame, and the physics server cannot keep up with a shape that gets recreated 60 times a second. <strong>The fix that worked was to throw the physics engine out of it entirely.</strong> Compare the player's Y coordinate to the water's top edge each frame. If the player is at or below the surface and inside the horizontal span of the pool, call <code>die()</code>. No signals, no overlap, no shape. Geometry.</p>
-
-    <h2>The death loop</h2>
-    <p>Then the second bug. I pulled the lever, climbed half the escape shaft, missed a jump, drowned, respawned at the climb checkpoint... <em>under water</em>. The checkpoint is at a fixed Y. After about seven seconds of flood the water sits above that Y. Respawning into it killed me again. Then again. Then again.</p>
-    <p>Two ways to fix this. Move the checkpoint above the water's top. Or reset the flood when the player dies. I went with the reset. Added a <code>died</code> signal to the player. Mission 2 listens. When it fires during a flood, the script snaps the water back to its starting position and restarts the rising tween from zero. You respawn dry, with twenty seconds on the clock again. Clean retry. A clean retry was the whole point of putting a checkpoint there.</p>
-
-    <h2>Two small things that saved me an hour</h2>
-    <p>Both of these are dev quality-of-life and neither was on today's plan, but they came up and they are sticking.</p>
-    <p>The mission-end card. Every time I opened a mission scene in the editor today, a giant orange "MISSION 1 COMPLETE" panel sat in the middle of the screen, covering the level I was trying to edit. The card hides itself at runtime via an alpha tween, but the editor never runs the script that hides it. So in the editor it was always on. Fix: ship the scene with the whole layer set to invisible, and turn it visible at runtime instead. Half a line. Made the editor usable again.</p>
-    <p>The bigger one is the refresh script. After every commit I run a shell command that kills the old game window and launches a fresh build. It always launched into the Prelude scene. Which is a two-minute cinematic walk before you reach the first mission. <strong>I was sitting through that walk thirty times a day.</strong> I added a <code>--scene</code> flag that remembers which mission I am testing and persists it to a file. Now every refresh boots straight into Mission 2 Pit. The first refresh that did it I laughed out loud at my desk.</p>
+    <p>The reason: in Godot, hazards fire on the instant a body <em>enters</em> the danger zone, not while it sits inside one. The flood was growing the danger zone upward through a body that was already standing still. The player never entered anything. The water just got bigger around him. The fix was to stop asking the physics engine and just compare two numbers each frame: where is the water surface, where is the player. The day's other surprise was the same shape. Dying mid-climb respawned me into already-risen water and looped my death. The reset was the same trick, applied backwards.</p>
 
     <h2>End to end</h2>
     <p>The last commit of the day was four characters long. Mission 1's master switch was still pointing at the archived Mission 2 backdrop. I retargeted it at <code>M2_Pit.tscn</code> and saved. The whole chain is wired again. Prelude into Mission 1 into the new Mission 2 into Mission 3 into Mission 4 into the elevator. You can sit down and play all of it in one go.</p>
@@ -68,6 +62,10 @@
       <span class="post-nav-title">Day 9: forty-six commits and a memory rule</span>
     </a>
     <a class="post-nav-index" href="./">All posts</a>
+    <a class="post-nav-next" href="pull-the-plug-day-11.html">
+      <span class="post-nav-label">Next &rarr;</span>
+      <span class="post-nav-title">Day 11: a CMS for a writer who isn't me</span>
+    </a>
   </nav>
 
   <section class="comments" aria-labelledby="comments-heading" data-post-id="pull-the-plug-day-10">

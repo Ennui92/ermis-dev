@@ -418,6 +418,33 @@ main.post article a:focus-visible {
   font-weight: 600;
 }
 
+.post-tldr {
+  margin: 8px 0 28px;
+  padding: 16px 20px;
+  background: var(--pill-bg);
+  border-left: 4px solid var(--accent, #4a8fe7);
+  border-radius: 0 12px 12px 0;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.post-tldr p { margin: 0; }
+
+.post-tldr strong {
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.post-tldr code {
+  background: rgba(0, 0, 0, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.88em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
 /* Posts index page */
 main .post-back { margin-bottom: 16px; }
 

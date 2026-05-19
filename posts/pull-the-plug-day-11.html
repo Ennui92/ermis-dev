@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 11: a CMS for a writer who isn't me — Ermis Zacharopoulos</title>
+<meta name="description" content="Day 11 of building Pull the Plug. I built a narrator-script editor for a creative freelancer. She types, hits Save, three minutes later the live game says her words.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=2026-05-19-day11a">
+<meta property="og:title" content="Day 11: a CMS for a writer who isn't me">
+<meta property="og:description" content="I built a narrator-script editor for a creative freelancer. She types, hits Save, three minutes later the live game says her words.">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://ermis.dev/assets/posts/day-10-water-that-did-not-kill.png">
+<meta property="og:url" content="https://ermis.dev/posts/pull-the-plug-day-11.html">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<main class="post">
+  <p class="post-back"><a href="../#posts">&larr; Posts</a></p>
+
+  <article>
+    <header class="post-head">
+      <p class="post-meta">19 May 2026 &middot; Diary</p>
+      <h1>Day 11: a CMS for a writer who isn't me</h1>
+      <p class="post-lede">Today I built a narrator-script editor and gave the URL to a creative freelancer. She types into a text box on the web. She hits Save. About three minutes later the live game says her words. Nobody pushes anything. I am not in the loop.</p>
+    </header>
+
+    <aside class="post-disclaimer">
+      <p><strong>Small disclaimer before you read.</strong> I wanted to document this experiment, but I do not have the time to write or remember everything after so many days. So I asked Claude to put these notes together using the tone of voice it could pick up from my podcast. It did okay-ish. Read at your own risk. If you have questions about any of this, ask me and I promise to answer with my actual brain.</p>
+    </aside>
+
+    <aside class="post-tldr">
+      <p><strong>TL;DR.</strong> Built a password-gated narrator-line editor at <code>/atlas-cms/</code> so a freelance writer can edit text without my involvement. Save click triggers a GitHub Action that re-exports the game and ships to Cloudflare. Round trip about three minutes. Spent two hours fighting Cloudflare's edge cache, which kept serving the editor without checking the password. Also killed the drone music, switched the default character to the red-beanie vector one, and built a light theme because dark hurt my eyes.</p>
+    </aside>
+
+    <h2>Why a CMS, and why someone else</h2>
+    <p>The narrator is the moat. I have said this since day one. It is also the part of the game I am least good at. I can engineer the system that delivers the lines. I cannot reliably write 115 lines of paternal-disappointed AI voice without sounding like I am trying.</p>
+    <p>A friend who actually writes for a living offered to take a pass. I said yes the same day. Then I had to figure out how to give her access without handing her a Godot project and a copy of git.</p>
+    <p>That meant a CMS. <strong>An editor on the web, behind a password, that writes commits to the repo on her behalf.</strong> She never opens the engine. I never copy-paste her text into <code>.tscn</code> files. The pipeline does both.</p>
+
+    <h2>What she sees</h2>
+    <p>The Atlas was already there. I built it weeks ago as a read-only browser of every narrator line in the game, organised by mission and zone, cross-referenced with the tone notes and the easter-egg policy. It runs as a single HTML file, edits live in localStorage, and used to export a JSON file I would manually apply.</p>
+    <p>Today I made three changes. The atlas is now password-gated with its own login (<code>guest</code> / a password I will give her). Every line card has an Edit button that opens a textarea. The Save button at the top no longer downloads a file. It posts the edits to the Cloudflare Worker that fronts the game and the Worker commits them to the repo.</p>
+    <p>I also rewrote the visual layer. The mission tabs read as <strong>"🖥️ M1 · Cradle / the data center"</strong> instead of <strong>"M1"</strong>, with little icons per zone, so somebody who has never seen the design doc can still tell what they are looking at. The tape collectibles get their own card style now because the player-facing cassette name and the narrator's later reaction to the tape were two different things and the old card collapsed them into one quoted block. New writer would have thought the quoted line was the cassette name and "fixed" it. Caught it before sending her the URL.</p>
+
+    <h2>How saves reach the game</h2>
+    <p>Here is the pipeline I ended up with.</p>
+    <ol>
+      <li>She edits in the browser, hits Save.</li>
+      <li>The Worker accepts the JSON, commits it into the repo at <code>tools/narrator-edits/incoming-&lt;timestamp&gt;.json</code> via the GitHub API.</li>
+      <li>A new GitHub Action wakes up on that commit. It applies the edits to the actual source files. Godot is installed in the runner, re-exports the game headlessly, and the rebuilt build gets committed back to the repo.</li>
+      <li>Cloudflare auto-deploys the rebuilt site.</li>
+      <li>She refreshes the live URL. Her words are in the game.</li>
+    </ol>
+    <p>Round trip is about three minutes. Five if the CI runner has not cached the Godot binary from a previous run. <strong>I tested it once by saving a fake edit and watching the Actions tab. It worked on the second try.</strong> First try crashed because the runner did not have <code>sharp</code> (image library) and Godot's headless export skipped every asset because <code>.godot/imported/</code> was empty. Two lines of YAML fixed both. The whole loop now runs without me.</p>
+
+    <h2>The Cloudflare cache fight</h2>
+    <p>This is the texture of the day. Most of the actual work was not the pipeline. It was a two-hour argument with Cloudflare's edge cache.</p>
+    <p>The Worker is supposed to check the password before serving the editor. The first version did. I tested. Locked out. Good. Then I tested with the correct password. Got in. Good. Then I tested with the WRONG password again. <strong>Still got in.</strong></p>
+    <p>What happened is that the first successful login response got cached at Cloudflare's edge, and after that every request to that URL was served the cached HTML directly without ever asking the Worker whether the request was authorised. The cache was sitting between the user and my code, doing its job too well.</p>
+    <p>I tried four different fixes. Renaming the URL. Telling Cloudflare not to cache the response. Telling Cloudflare not to even <em>look</em> at static files with that name. Each fix worked for one path and exposed another. The thing that finally worked was embedding the editor HTML directly into the Worker's source code as a string. No file in the static folder. No cache layer to bypass. The Worker is the only way the HTML exists, and the Worker checks the password every time.</p>
+    <p>I learned more about Cloudflare's caching model in those two hours than I have all year. None of it was material I was looking for.</p>
+
+    <h2>The other things that happened</h2>
+    <p>While I was waiting for the CI to deploy, I cleaned up three smaller items.</p>
+    <p>The drone music in the game is gone. I had been ambivalent about it for weeks. Today I said it out loud, "I hate that drone," and ripped it. The piano layer that sits on top is what stays. The drone code is still there as a no-op for any old save file that still references it, but no audio plays and the toggle is hidden from the settings menu. Twenty-three megabytes of OGG files no longer ship to mobile.</p>
+    <p>The default character is now the red-beanie vector one. I have six character slots, three pixel and three vector. The red beanie was always the one that looked most <em>like a person trying to break in</em>, which is what the game is about. I made it the cold-start default for new players. Existing saves keep whatever they had.</p>
+    <p>I built a light theme for the Atlas because the dark one was making my eyes hurt after eight hours of staring at it. It is GitHub-light palette, the toggle remembers, and the writer will see the light theme first.</p>
+
+    <h2>One thing I want to remember</h2>
+    <p>The freelancer has not used the editor yet. She gets the URL tomorrow. I keep wanting to call this end-to-end, automatic, done. It will not be done until she actually saves a line, the line reaches the live game, she sees it, and she tells me whether the experience felt like "I edited a Google doc" or "I filed a ticket with engineering". That is the only test that matters.</p>
+    <p>If it works the way I hope, the game gets a real narrator voice without me typing any of it. If it doesn't, I will know within a week.</p>
+  </article>
+
+  <nav class="post-nav" aria-label="Post navigation">
+    <a class="post-nav-prev" href="pull-the-plug-day-10.html">
+      <span class="post-nav-label">&larr; Previous</span>
+      <span class="post-nav-title">Day 10: a Mission 2 on paper and three tries at a drowning</span>
+    </a>
+    <a class="post-nav-index" href="./">All posts</a>
+  </nav>
+
+  <section class="comments" aria-labelledby="comments-heading" data-post-id="pull-the-plug-day-11">
+    <h2 id="comments-heading">Comments</h2>
+    <p class="comments-intro">Anyone can post. Captcha keeps the bots out. No links allowed.</p>
+
+    <ul class="comment-list" id="comment-list" aria-live="polite">
+      <li class="comment-loading">Loading comments&hellip;</li>
+    </ul>
+
+    <form class="comment-form" id="comment-form" novalidate>
+      <div class="comment-honeypot" aria-hidden="true">
+        <label for="comment-website">Website (leave blank)</label>
+        <input type="text" id="comment-website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="comment-field">
+        <label for="comment-name">Name <span class="comment-hint">(optional)</span></label>
+        <input type="text" id="comment-name" name="name" maxlength="40" autocomplete="off" placeholder="Anonymous">
+      </div>
+
+      <div class="comment-field">
+        <label for="comment-body">Comment</label>
+        <textarea id="comment-body" name="body" rows="6" maxlength="800" required placeholder="Say something. No links."></textarea>
+        <p class="comment-counter"><span id="comment-counter">0</span> / 800</p>
+      </div>
+
+      <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="light"></div>
+
+      <div class="comment-actions">
+        <button type="submit" id="comment-submit">Post comment</button>
+        <p class="comment-status" id="comment-status" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+
+    <noscript>
+      <p class="comments-fallback">Comments need JavaScript. Email me via the link in the footer instead.</p>
+    </noscript>
+  </section>
+
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="../assets/comments.js?v=2026-05-19-day11" defer></script>
+
+  <footer>
+    <ul class="socials">
+      <li><a href="../">&larr; ermis.dev</a></li>
+      <li><a href="https://www.linkedin.com/in/ermis-zacharopoulos-2819968b/" target="_blank" rel="noopener">LinkedIn</a></li>
+      <li><a href="https://github.com/Ennui92" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <p class="meta">Ermis Zacharopoulos &middot; Berlin</p>
+  </footer>
+</main>
+</body>
+</html>
