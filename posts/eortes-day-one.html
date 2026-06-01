@@ -59,6 +59,11 @@
       <figcaption>The Αργίες tab. Public holidays for any year, computed from the same Pascha math. The Easter-anchored ones move; the fixed ones don't. Tap one to see which names celebrate.</figcaption>
     </figure>
 
+    <figure class="post-figure">
+      <img src="../assets/posts/eortes-day-one-calendar.png" alt="The monthly calendar view of Eortes in Greek. The header 'Ιούνιος 2026' in large serif. A standard month grid with the days of the week as initials across the top. Each day cell shows the date number and, beneath it, a small coloured dot indicating the day's fasting level: green for Κατάλυση (no fast), red for full fast, ochre for milder restrictions. The 14th and 15th have small flags marking great feasts. Today's date is circled in gold." loading="lazy">
+      <figcaption>The Ημερολόγιο tab. Every day a coloured dot for its fasting status, computed from Pascha. Tap a day for the names and the rules.</figcaption>
+    </figure>
+
     <h2>The thing that blocks launch</h2>
     <p>The engine is done. The four screens are done. The fasting math is done. The Apple In-App Purchase + Google Play Billing wrapper is wired through RevenueCat, so the People layer (the reminders + the one-tap "wish them a happy name-day") unlocks with a one-time small payment, no subscription. There is a launch playbook in the repo for "publish this and then walk away."</p>
     <p>The thing that blocks me is the data. The fixed name-day table I have right now is what the engineer in me calls a high-confidence skeleton. About 73 entries spanning all 12 months, with the major saints in. Every single entry carries a flag called <code>VERIFY</code> in the data file. The app shows a footnote in the corner that says <em>Στοιχεία υπό επαλήθευση με το Συναξάρι.</em> Data being verified against the Synaxarion.</p>
