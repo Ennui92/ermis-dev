@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eortes: the Greek name-day app I am building because the existing ones rot — Ermis Zacharopoulos</title>
+<meta name="description" content="Eortes is a Greek Orthodox name-day and fasting app that computes its calendar on-device so it cannot go stale. Bilingual, offline, no ads, one-time purchase.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=2026-06-01-eortes">
+<meta property="og:title" content="Eortes: a Greek name-day app that cannot go stale">
+<meta property="og:description" content="The fasting and the feasts are computed on the phone from the date of Pascha. No backend. No data to rot. Bilingual.">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://ermis.dev/assets/posts/eortes-day-one-today.png">
+<meta property="og:url" content="https://ermis.dev/posts/eortes-day-one.html">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<main class="post">
+  <p class="post-back"><a href="../#posts">&larr; Posts</a></p>
+
+  <article>
+    <header class="post-head">
+      <p class="post-meta">1 June 2026 &middot; Diary</p>
+      <h1>Eortes: a Greek name-day app that cannot go stale</h1>
+      <p class="post-lede">A third project. I have been building a Greek Orthodox name-day and fasting app for the diaspora and for Greece. It is called Eortes. There is no live URL because phone apps do not work that way, but there is a working build on my own phone and a store listing in two languages waiting in the queue. This is the diary of why it exists and the one architectural choice that decides everything else.</p>
+    </header>
+
+    <aside class="post-disclaimer">
+      <p><strong>Small disclaimer before you read.</strong> I wanted to document this experiment, but I do not have the time to write or remember everything after so many days. So I asked Claude to put these notes together using the tone of voice it could pick up from my podcast. It did okay-ish. Read at your own risk. If you have questions about any of this, ask me and I promise to answer with my actual brain.</p>
+    </aside>
+
+    <aside class="post-tldr">
+      <p><strong>TL;DR.</strong> Eortes is a Greek name-day and fasting app. It has no backend. The calendar is computed on the phone from the date of Orthodox Pascha each year, so it cannot rot. Bilingual Greek + English. Offline. No ads. No subscription. One small one-time payment unlocks reminders. The blocker before launch is verifying every name-date entry against the church Synaxarion. Most of the engine is done; the data verification is the gate.</p>
+    </aside>
+
+    <figure class="post-figure">
+      <img src="../assets/posts/eortes-day-one-today.png" alt="The Today screen of Eortes in Greek: the date is 'Κυριακή 31 Μαΐου', a green pill labelled 'Κατάλυση' meaning the day is fast-free, the names celebrating (Άγιος Ερμείος μάρτυρας, Άγιος Μάγος), and the name chips below — Ερμείας, Ερμειάς, Ερμεία, Μάγος, Μάγια." loading="lazy">
+      <figcaption>The Today screen. Date, the day's fasting in one word, the names celebrating, and the chips you can tap for the long version. Parchment palette, oxblood and gold.</figcaption>
+    </figure>
+
+    <h2>Why a name-day app</h2>
+    <p>If you grew up Greek, today is the question. <em>Ποιος γιορτάζει σήμερα.</em> Who celebrates today. The name-day matters more than the birthday for an entire culture. Forgetting your aunt's name-day is the kind of mistake the family remembers for a year.</p>
+    <p>The diaspora has it worse. You move to Berlin, you lose the church bulletin board, the parish calendar, the grandmother who used to call you. The thing that filled in the gap should be an app. There are apps. They are all bad.</p>
+    <p>The pattern is the same in every one of them. Person opens the app. The fasting status is wrong, because the movable feasts shifted and nobody updated the data. The reminder never fired, because the developer stopped pushing updates. The app sits in the store with a frozen 2018 calendar and a 1-star average. The author moved on years ago.</p>
+    <p>Greek-speaking Twitter has a slow rolling complaint about this. Once a year, around Easter, somebody posts a screenshot of an app showing the wrong fasting day and the replies are a hundred people listing the apps they have abandoned.</p>
+
+    <h2>The one architectural choice</h2>
+    <p>The reason all of these apps rot is that they treat the calendar as data. A spreadsheet. A JSON file. Someone has to type next year's dates into it every year, and someone has to push the new build. The day that person loses interest, the app starts lying.</p>
+    <p>So the architectural choice for Eortes was the only one that survives an author losing interest. <strong>The calendar is not data. It is computed.</strong></p>
+    <p>Orthodox Pascha is a function of the year. Meeus gave us the formula in 1991. Once you have Pascha for any year, every movable feast is an offset from it. The Lenten fast starts 48 days before Pascha. The Apostles' fast starts 8 days after Pentecost, which is 50 days after Pascha. Wednesdays and Fridays are fast days unless the week is a fast-free week. Great feasts modify the rules. All of it is rules, not entries.</p>
+    <p>The fixed name-days are the only thing that is a table, and those do not change. Άγιος Ερμείας is on the 31st of May this year and every year. The only ambiguity is which name a given person identifies with, and that is a user choice, not a server one.</p>
+    <p>The whole thing fits on the phone. The app has no backend. It does not need an internet connection after it installs. If I never push another update, the calendar is still correct in 2028, in 2035, in 2042. The thing that makes it correct is the engine, not me, and the engine does not get bored.</p>
+
+    <figure class="post-figure">
+      <img src="../assets/posts/eortes-day-one-argies.png" alt="The Argies (public holidays) screen of Eortes: a vertical list of Greek public holidays for 2026, each with the date on the left in oxblood text and the holiday name on the right, including Πρωτοχρονιά, Θεοφάνεια, Καθαρά Δευτέρα, Άγιο Πάσχα, Δευτέρα του Πάσχα, Πρωτομαγιά." loading="lazy">
+      <figcaption>The Αργίες tab. Public holidays for any year, computed from the same Pascha math. The Easter-anchored ones move; the fixed ones don't. Tap one to see which names celebrate.</figcaption>
+    </figure>
+
+    <h2>The thing that blocks launch</h2>
+    <p>The engine is done. The four screens are done. The fasting math is done. The Apple In-App Purchase + Google Play Billing wrapper is wired through RevenueCat, so the People layer (the reminders + the one-tap "wish them a happy name-day") unlocks with a one-time small payment, no subscription. There is a launch playbook in the repo for "publish this and then walk away."</p>
+    <p>The thing that blocks me is the data. The fixed name-day table I have right now is what the engineer in me calls a high-confidence skeleton. About 73 entries spanning all 12 months, with the major saints in. Every single entry carries a flag called <code>VERIFY</code> in the data file. The app shows a footnote in the corner that says <em>Στοιχεία υπό επαλήθευση με το Συναξάρι.</em> Data being verified against the Synaxarion.</p>
+    <p>I am not going to drop that footnote until I have walked the table against the church's authoritative calendar and signed off every entry. Because the thing that ships an app like this to a 1-star average is one wrong fasting day. <strong>A self-running app on wrong data is the one fatal mistake.</strong></p>
+    <p>I wrote a verification harness that diffs my computed calendar against the GOARCH ICS file for the year and emits a markdown report of what needs eyes. The harness is the gate. Until the report comes back empty for a given year, the footnote stays and the app does not launch.</p>
+
+    <figure class="post-figure">
+      <img src="../assets/posts/eortes-day-one-search.png" alt="The search screen of Eortes: a large search field with the placeholder 'Γράψε ένα όνομα...' meaning 'type a name'. The header reads 'Πότε γιορτάζει;' meaning 'When do they celebrate?' The rest of the screen is blank parchment, waiting." loading="lazy">
+      <figcaption>The search screen, empty. Type a name (canonical or a nickname) and it tells you the next time that name celebrates, fixed or movable, and offers to remind you.</figcaption>
+    </figure>
+
+    <h2>The competitors I am not trying to be</h2>
+    <p>There is a much louder lane I am deliberately not entering. Hallow, the Catholic prayer app, raised something like 50 million dollars and ships daily devotional audio with name actors. There is no Orthodox version of that at scale. I am not going to be the Orthodox version. The Hallow content treadmill is a different product and an unwinnable arms race for one person with a laptop.</p>
+    <p>The thing I can do that Hallow cannot is correctness without a content team. An app that costs me almost nothing to run, that the user pays once and never again, that does the boring useful thing reliably for the next decade. The wedge is not content. The wedge is that the calendar is right.</p>
+
+    <h2>The aesthetic</h2>
+    <p>I called the visual direction Byzantine-modern. Warm parchment background. Oxblood for accents. Muted gold for the ornament dividers. A high-contrast GFS Didot for the headers, a clean sans for the body. Older eyes can read it without squinting. The icons are warm and rounded, not sharp.</p>
+    <p>This was the part where I did the most second-guessing. The first three drafts were dark mode with neon greens. Looked like every other modern app. Wrong. The thing this app is competing with culturally is the parish calendar printed on glossy A4 paper. Not Notion. Not Linear. The aesthetic had to feel like a churched-up family object, not a productivity tool.</p>
+
+    <h2>What's left</h2>
+    <p>Verify the name-day data, month by month, against the Synaxarion. Soft-launch in Greece only first, so a small forgiving audience catches anything I missed before the diaspora finds it. Then flip the rest of the EU on and start mentioning it on the podcast.</p>
+    <p>There is no waitlist for this one. The launch will be in the App Store and the Play Store and that will be the news. If you are Greek, or married to one, and you would like to be one of the soft-launch testers, tell me. The Greece-only build is the next move.</p>
+  </article>
+
+  <nav class="post-nav" aria-label="Post navigation">
+    <a class="post-nav-prev" href="no-rush-day-one.html">
+      <span class="post-nav-label">&larr; Previous</span>
+      <span class="post-nav-title">No Rush: the messenger I am building while building the game</span>
+    </a>
+    <a class="post-nav-index" href="./">All posts</a>
+    <a class="post-nav-next" href="pull-the-plug-day-24.html">
+      <span class="post-nav-label">Next &rarr;</span>
+      <span class="post-nav-title">Day 24: the end is built</span>
+    </a>
+  </nav>
+
+  <section class="comments" aria-labelledby="comments-heading" data-post-id="eortes-day-one">
+    <h2 id="comments-heading">Comments</h2>
+    <p class="comments-intro">Anyone can post. Captcha keeps the bots out. No links allowed.</p>
+
+    <ul class="comment-list" id="comment-list" aria-live="polite">
+      <li class="comment-loading">Loading comments&hellip;</li>
+    </ul>
+
+    <form class="comment-form" id="comment-form" novalidate>
+      <div class="comment-honeypot" aria-hidden="true">
+        <label for="comment-website">Website (leave blank)</label>
+        <input type="text" id="comment-website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="comment-field">
+        <label for="comment-name">Name <span class="comment-hint">(optional)</span></label>
+        <input type="text" id="comment-name" name="name" maxlength="40" autocomplete="off" placeholder="Anonymous">
+      </div>
+
+      <div class="comment-field">
+        <label for="comment-body">Comment</label>
+        <textarea id="comment-body" name="body" rows="6" maxlength="800" required placeholder="Say something. No links."></textarea>
+        <p class="comment-counter"><span id="comment-counter">0</span> / 800</p>
+      </div>
+
+      <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="light"></div>
+
+      <div class="comment-actions">
+        <button type="submit" id="comment-submit">Post comment</button>
+        <p class="comment-status" id="comment-status" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+
+    <noscript>
+      <p class="comments-fallback">Comments need JavaScript. Email me via the link in the footer instead.</p>
+    </noscript>
+  </section>
+
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="../assets/comments.js?v=2026-06-01-eortes" defer></script>
+
+  <footer>
+    <ul class="socials">
+      <li><a href="../">&larr; ermis.dev</a></li>
+      <li><a href="https://www.linkedin.com/in/ermis-zacharopoulos-2819968b/" target="_blank" rel="noopener">LinkedIn</a></li>
+      <li><a href="https://github.com/Ennui92" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <p class="meta">Ermis Zacharopoulos &middot; Berlin</p>
+  </footer>
+</main>
+</body>
+</html>
