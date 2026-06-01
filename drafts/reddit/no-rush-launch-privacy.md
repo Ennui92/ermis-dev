@@ -24,7 +24,7 @@ Voice notes that transcribe to text on the recipient's device, locally, via Whis
 
 Free, no ads, no subscription. The code is going up under an open licence. If you want to spin up your own relay, you can.
 
-Take it for a spin and tell me if it feels calm to use, because that's the only test that matters. Comments here or on ermis.dev/posts/no-rush-day-one.html.
+Take it for a spin and tell me if it feels calm to use, because that's the only test that matters. Comments here or on ennui92.github.io/ermis-dev/posts/no-rush-day-one.html.
 
 ---
 

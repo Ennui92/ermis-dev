@@ -26,7 +26,7 @@ Wrote a "composition audit" Claude skill that takes the player's silhouette as a
 
 48 commits across the fortnight. I'm a non-coder; Claude writes the GDScript, I direct.
 
-Devlog with the full writeup, including the playtest photo, at ermis.dev/posts/pull-the-plug-day-24.html. Happy to answer anything about the narrator pipeline, the de-render arc, or what it's like building a game with Claude as the engineer.
+Devlog with the full writeup, including the playtest photo, at ennui92.github.io/ermis-dev/posts/pull-the-plug-day-24.html. Happy to answer anything about the narrator pipeline, the de-render arc, or what it's like building a game with Claude as the engineer.
 
 ---
 
