@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f7f4ee"/>
+      <stop offset="100%" stop-color="#ebe6db"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- soft outer ring around the breathing dot -->
+  <circle cx="600" cy="220" r="56" fill="none" stroke="#5b7b6f" stroke-opacity="0.18" stroke-width="6"/>
+  <circle cx="600" cy="220" r="34" fill="#5b7b6f"/>
+
+  <!-- wordmark -->
+  <text x="600" y="380" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-weight="500" font-size="110" fill="#2b2a26" letter-spacing="-2">No Rush</text>
+
+  <!-- tagline -->
+  <text x="600" y="450" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-style="italic" font-size="36" fill="#41594f">It's okay to not be available.</text>
+
+  <!-- footer line -->
+  <text x="600" y="540" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="22" fill="#6b675e">End-to-end encrypted &#183; No notifications &#183; Berlin</text>
+</svg>
