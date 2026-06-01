@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>No Rush: the messenger I am building while building the game — Ermis Zacharopoulos</title>
-<meta name="description" content="A slow, end-to-end encrypted messenger called No Rush. No notifications. No green dot. No badge. Three weeks in, you can take it for a spin.">
+<title>No Rush: a calm messenger I am building on the side — Ermis Zacharopoulos</title>
+<meta name="description" content="A slow encrypted messenger. No notifications, no badge, no green dot. Free. Code goes open. Take it for a spin.">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../styles.css?v=2026-06-01-norush-b">
-<meta property="og:title" content="No Rush: the messenger I am building while building the game">
-<meta property="og:description" content="A slow, end-to-end encrypted messenger. No notifications. Free. Code goes open. Take it for a spin.">
+<link rel="stylesheet" href="../styles.css?v=2026-06-01-norush-c">
+<meta property="og:title" content="No Rush: a calm messenger I am building on the side">
+<meta property="og:description" content="No notifications. No badge. No green dot. Free. Code goes open. Take it for a spin.">
 <meta property="og:type" content="article">
-<meta property="og:image" content="https://ennui92.github.io/ermis-dev/assets/posts/no-rush-day-one-hero.png">
+<meta property="og:image" content="https://ennui92.github.io/ermis-dev/assets/no-rush-promo.svg">
 <meta property="og:url" content="https://ennui92.github.io/ermis-dev/posts/no-rush-day-one.html">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -24,40 +24,21 @@
   <article>
     <header class="post-head">
       <p class="post-meta">1 June 2026 &middot; Diary</p>
-      <h1>No Rush: the messenger I am building while building the game</h1>
-      <p class="post-lede">I have another project. It is called No Rush. It is a slow, end-to-end encrypted messenger. The site is at <a href="https://norush.chat" target="_blank" rel="noopener">norush.chat</a>. The app is a prototype you can open on your phone at <a href="https://app.norush.chat" target="_blank" rel="noopener">app.norush.chat</a> and add to your home screen. It is free. The code will be open. Go take it for a spin.</p>
+      <h1>No Rush: a calm messenger I am building on the side</h1>
+      <p class="post-lede">I have another project. It is called No Rush. A slow, encrypted messenger. The site is at <a href="https://norush.chat" target="_blank" rel="noopener">norush.chat</a>. You can install the prototype to your home screen from <a href="https://app.norush.chat" target="_blank" rel="noopener">app.norush.chat</a> and try it. Free. The code goes open.</p>
     </header>
 
     <aside class="post-disclaimer">
       <p><strong>Small disclaimer before you read.</strong> I wanted to document this experiment, but I do not have the time to write or remember everything after so many days. So I asked Claude to put these notes together using the tone of voice it could pick up from my podcast. It did okay-ish. Read at your own risk. If you have questions about any of this, ask me and I promise to answer with my actual brain.</p>
     </aside>
 
-    <aside class="post-tldr">
-      <p><strong>TL;DR.</strong> A calm encrypted messenger. No push, no badge, no green dot, no read receipts. Built on the Signal protocol with a server that holds short-lived sealed envelopes it cannot read. Live prototype at <a href="https://app.norush.chat" target="_blank" rel="noopener">app.norush.chat</a> — add it to your home screen. Free. Code goes open. Site at <a href="https://norush.chat" target="_blank" rel="noopener">norush.chat</a>.</p>
-    </aside>
-
-    <h2>Why I started a second thing</h2>
-    <p>Pull the Plug is a game about an AI that does not want to be unplugged. While I was writing the narrator's lines I noticed I was angry, more than the game asked me to be, about a smaller version of the same thing. The phone in my pocket has been pulling my attention since 2010 and I do not love the deal.</p>
-    <p>Messengers are most of the deal. WhatsApp wakes me up. Telegram tells me who is typing. iMessage shows the read receipt I did not ask anyone to add. The green dot, the badge count, the "online 2m ago" string. Every one of them is a small lever turning a friendly thing into a debt.</p>
-    <p>So one Friday night I wrote down what the opposite would look like. <strong>No notifications, no badge, no green dot, no read receipts, no typing indicators, none of the levers.</strong> The product is the absence of all of those, engineered into the architecture so it is not just a setting that can be flipped back on by a future update.</p>
-    <p>The next morning I started building it.</p>
-
-    <h2>What the server cannot see</h2>
-    <p>The whole thing sits on the Signal protocol. The interesting part is not the crypto. It is what the server is allowed to know.</p>
-    <p>Almost nothing. The server holds short-lived sealed envelopes addressed to a recipient mailbox. It does not know who sent any envelope. It deletes the envelope the instant the recipient's device fetches it. If somebody breaches the server tomorrow, what they find is hashed phone numbers and a queue that drains on a cron.</p>
-    <p>The moment I will remember about this project is the first time I watched it work. Two browser tabs, one for me, one for a friend. A hello went out. The decrypted text showed up across the room a few seconds later. I clicked into the database to look at the envelopes table.</p>
-    <p>It was empty. The row had been deleted. The plaintext was already on her phone. <strong>No copy on the server.</strong> That is the moment a privacy claim stops being a sentence on a page and becomes a thing you can see in a database.</p>
-
-    <h2>What it does that I did not plan</h2>
-    <p>A few things surprised me about what the product wanted to be once it was running.</p>
-    <p><strong>The letter.</strong> A longer message can be sent as an actual letter, on coloured paper, in a serif font, signed at the bottom in your own handwriting after you flip the phone sideways to sign. It is one of those things that does not show up in the spec but feels exactly right once it exists. People use it for the thing the spec calls "I want to write to my friend in a slower way." I did not write the spec.</p>
-    <p><strong>Voice notes.</strong> They transcribe to text on the recipient's device, locally, using Whisper. The audio never goes through a transcription server. You get the bubble with a waveform AND the text, and you decide which one you want.</p>
-    <p><strong>Morning mail.</strong> You write the message at 1am, you tell it to deliver at 9. The envelope sits in the queue with a not-before timestamp and the relay holds it until then. Nobody is awake at 1am to read your 1am thought. The friend gets it with their coffee.</p>
+    <h2>The point</h2>
+    <p>No push notifications. No badge. No green dot. No read receipts. No typing indicators. None of the small levers that turn a friendly thing into a debt.</p>
+    <p>Most of building it has been removing these one at a time, on purpose, and engineering the architecture so they cannot quietly come back.</p>
 
     <h2>Take it for a spin</h2>
-    <p>Open <a href="https://app.norush.chat" target="_blank" rel="noopener">app.norush.chat</a> on your phone. Add it to your home screen. Register with a number, send a friend the install link, write each other a letter. Nothing will buzz. The conversation will sit there until one of you decides to open it. That is the entire pitch and the only way to actually feel it is to use it for a few days.</p>
-    <p>Free, no ads, no subscription. The code will go up under an open licence so anyone who wants to read it or run their own relay can. If you have feedback, the comments below or my email both work.</p>
-    <p>That is day one of a calm messenger. The site is one folder of HTML. The app is a tab in your browser and, once you install it, an icon on your phone. The waitlist will not message you. You can check the site if you want to know when there is news. That is the entire point.</p>
+    <p>Open <a href="https://app.norush.chat" target="_blank" rel="noopener">app.norush.chat</a> on your phone, register, send a friend the install link, write each other something. Nothing will buzz. The conversation will sit there until one of you decides to open it. <strong>The only way to feel it is to use it for a few days.</strong></p>
+    <p>Free, no ads, no subscription. The code is going up under an open licence. Feedback is welcome in the comments or by email.</p>
   </article>
 
   <nav class="post-nav" aria-label="Post navigation">

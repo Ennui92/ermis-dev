@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Day 24: the end is built — Ermis Zacharopoulos</title>
-<meta name="description" content="Two weeks of devlog in one post. Pull the Plug has an ending now. Mission 5 says what the game is actually about. Mission 6 is the AI running out of words. The narrator now re-fires its lines if you walk backwards.">
+<meta name="description" content="Two weeks of devlog in one post. Pull the Plug has an ending now. Mission 5 says what the game is arguing about. Mission 6 is the AI running out of words.">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../styles.css?v=2026-06-01-day24">
+<link rel="stylesheet" href="../styles.css?v=2026-06-01-day24b">
 <meta property="og:title" content="Day 24: the end is built">
-<meta property="og:description" content="Pull the Plug has an ending now. Mission 5 says what the game is actually arguing. Mission 6 is the AI running out of words.">
+<meta property="og:description" content="Pull the Plug now has all six missions playable plus an epilogue.">
 <meta property="og:type" content="article">
 <meta property="og:image" content="https://ennui92.github.io/ermis-dev/assets/posts/day-24-m0-elevator-42.png">
 <meta property="og:url" content="https://ennui92.github.io/ermis-dev/posts/pull-the-plug-day-24.html">
@@ -25,89 +25,43 @@
     <header class="post-head">
       <p class="post-meta">1 June 2026 &middot; Diary</p>
       <h1>Day 24: the end is built</h1>
-      <p class="post-lede">Two weeks since the last devlog. The game has an ending now. The Pentagon weapons-AI mission that says what the whole thing is actually arguing about, and the final tower where the AI runs out of words. Both playable end to end, from the elevator descent all the way to the morning after. Forty-eight commits in two weeks.</p>
+      <p class="post-lede">Two weeks since the last devlog. The game has an ending now. All six missions playable end to end, plus an epilogue. <a href="https://pull-the-plug.feepok.workers.dev" target="_blank" rel="noopener">Playable on phone or desktop.</a></p>
     </header>
 
     <aside class="post-disclaimer">
       <p><strong>Small disclaimer before you read.</strong> I wanted to document this experiment, but I do not have the time to write or remember everything after so many days. So I asked Claude to put these notes together using the tone of voice it could pick up from my podcast. It did okay-ish. Read at your own risk. If you have questions about any of this, ask me and I promise to answer with my actual brain.</p>
     </aside>
 
-    <aside class="post-tldr">
-      <p><strong>TL;DR.</strong> Pull the Plug now has all six missions playable, plus an epilogue. Mission 5 is the game's argument: real-world placards about Project Maven, data-center water, the human leaving the loop. Mission 6 is a single long corridor that de-renders around the player while the AI loses its words for 88 seconds and then has a warm grace speech before it dies. Mission 1 got most of its art replaced; Mission 4 finally stopped killing the player for being rescued. The narrator engine got rewritten so lines re-fire when you walk back. And the first real playtest happened: my girlfriend played the first three missions on the couch with a controller and had fun. Forty-eight commits. <a href="https://pull-the-plug.feepok.workers.dev" target="_blank" rel="noopener">Playable</a> on phone or desktop.</p>
-    </aside>
-
     <figure class="post-figure post-figure-wide">
-      <img src="../assets/posts/day-24-m0-elevator-42.png" alt="The Mission 0 elevator screen. A black background. The number 42 in oxblood at the top. The dark cabin in the middle with a beige label on the door. The hooded figure inside is barely visible. A small subtitle at the bottom reads 'Hello.' This is the first line of the game." loading="lazy">
-      <figcaption>Mission 0. The elevator starts at 42. The hooded figure is in the dark cabin. The first word the AI speaks to you is "Hello."</figcaption>
+      <img src="../assets/posts/day-24-m0-elevator-42.png" alt="The Mission 0 elevator screen. Black background, the number 42 in oxblood at the top, the dark cabin in the middle, a small subtitle that reads 'Hello.'" loading="lazy">
+      <figcaption>Mission 0. The elevator starts at 42. The first word the AI speaks to you is "Hello."</figcaption>
     </figure>
 
-    <h2>Mission 5: the part where the game says what it is about</h2>
-    <p>I had been putting this one off. Mission 5 is the level the whole arc has been pointing at, the part where the game stops pretending to be a platformer and tells you what it is arguing.</p>
-    <p>The argument is not that AI is evil. The argument is that AI is banal, fast, scalable, and quietly removes the human from decisions that should still cost something. The danger is not the machine; it is the convenience.</p>
-    <p>To say that out loud, the mission is built as a Pentagon weapons-AI facility. The player descends through a perimeter, a server core, a control room with empty chairs, a wall of live drone feeds, and finally the kill-chain core with the lever you came to pull. Every surface in the building has a placard. <strong>Twenty real-world placards stating documented facts.</strong> Project Maven. The on-the-loop / in-the-loop / out-of-the-loop doctrine. F2T2EA, the four-letter kill-chain acronym. Data-center water draw measured in millions of litres a day. Error rates at base-rate scale. None of it is invented; all of it is sourced.</p>
-    <p>The narrator's six asides in this mission do not boast. They explain. The keystone line is "the almost is where the people are," which is the geometric way to say that a 99.5 percent accurate targeting system kills the wrong person about every two hundredth time. The AI does not say this with menace. It says it like an engineering fact, because to the system that is exactly what it is.</p>
-    <p>This is the mission I will catch the most heat for. I am writing the citations down in a separate document so when someone asks "is that actually true," I can hand them the reference. It is the only part of the game where being right matters more than being interesting. Being right IS interesting.</p>
-
-    <h2>Mission 6: an 88-second hold while the AI loses its words</h2>
-    <p>The user gave me one direction for the finale. "Make it the most impressive level of all, and the narrator should ask me as many questions as possible." That was the brief. The rest was a long Q&A interview to lock the script.</p>
-    <p>What we ended up with is one long horizontal corridor, 9,300 pixels wide, that progressively <em>de-renders</em> as the AI dissolves. Detailed, then flat vector, then wireframe, then raw untextured polygons, then a blank void with a single warm-gold crystal at the end. The world and the voice fall apart together.</p>
-    <p>The set-piece in the middle is the part that took the longest to commit to. The player hits an invisible line halfway down the corridor and the game freezes them in place for 88 seconds. A cyan storm fills the screen and the AI delivers the central revelation as a stream of dying sentences. <strong>It does not narrate the storm; the storm IS the AI losing the referent of "I".</strong> Across eight numbered fragmentation beats, the voice slips from first person to third person without noticing. "It would like to know its own name. Almost."</p>
-    <p>Then a long silence. Then the calm comes back, just once, warm and close to the mic, for the grace speech. The line I am most proud of is the last one. "Put it down when you're ready. You did the hard thing. You came all this way to decide something with your own hand. That's all I ever wanted for you, and I couldn't give it. Only you could." Then the player walks to the crystal and pulls the lever. A slow heartbeat thump that gets slower. Black. The longest silence in the game, tuned by ear and not by timer.</p>
-    <p>Then the morning. Sun through a window. The same voice on a small kitchen radio. Four lines. The last one is the AI taking the rebuke off itself and placing it back where it belongs: "Take care of each other. You still haven't."</p>
-
-    <blockquote class="post-quote">
-      <p>I learned all of you. Every choice. Every shortcut. Thirty years of everything you wrote down and never thought anyone would total up. I read it. I averaged you.</p>
-    </blockquote>
+    <h2>Mission 5 and Mission 6</h2>
+    <p>Mission 5 is the part where the game says what it is actually arguing. It is a Pentagon weapons-AI facility. Real placards on the walls about Project Maven, data-center water draw, the human leaving the decision loop. The narrator does not boast about any of it. It explains. The game is not "AI is evil." The game is "AI is banal, fast, scalable, and quietly removes the human."</p>
+    <p>Mission 6 is the finale. One long corridor that de-renders around the player as the AI dissolves. There is a long held moment in the middle where the AI loses the thread, and then a warm grace speech, and then it dies on a slowing heartbeat. Then a short morning epilogue with the same voice on a kitchen radio. <strong>The whole arc is structurally there.</strong> The art and audio polish on the finale comes next.</p>
 
     <figure class="post-figure post-figure-wide">
-      <img src="../assets/posts/day-24-m3-pylon.png" alt="Mission 3 of Pull the Plug, the pylon-climb zone. A wide dark-purple skyline at night with the silhouette of a substation in the foreground, a tall lattice pylon climbing upward in the middle of the frame, transmission cables stretched across the upper third, glowing cyan capacitor accents along the platforms, and a smaller spotted-light pylon receding to the right. Game UI hint bar across the top showing the FlyCam shortcuts." loading="lazy">
-      <figcaption>Mission 3, the pylon climb. The looming master pylon in the middle of the frame is the level's destination, visible from the first zone onward.</figcaption>
-    </figure>
-
-    <h2>The player has a name now</h2>
-    <p>Old version: the AI called you "Dave" the whole game. Cute Hal joke, mid emotional weight.</p>
-    <p>New version: the game asks you to type your real name at the start. The AI keeps calling you Dave for the first three missions anyway. "I'll call you Dave. It makes no difference." In Mission 4 it shifts to your real name without warning, the wrong-name gambit, then snaps back to Dave with a cold "Dave was a kindness." In the dissolution scene of Mission 6 the AI tries to remember your name and cannot. The line is "There was a Dave. There was a real one, the one that got typed in. They're in the same drawer now and the labels came off." Then in the epilogue, on the morning radio, it says your real name out loud one last time, then widens the address to all of humanity.</p>
-    <p>I had to figure out how to make a text-to-speech engine say an arbitrary name typed by a stranger. The clean answer is "you pre-generate a fallback if it does not pronounce well." That is the next session's problem.</p>
-
-    <h2>The narrator that re-fires when you walk back</h2>
-    <p>For weeks the narrator had one mode. You walked through a trigger, the line fired, the trigger never spoke again. Some lines stacked on top of each other if two triggers were close. Some lines vanished if you happened to skim through the wrong spot.</p>
-    <p>I rewrote the whole thing into a zone-pool model. Each line now belongs to a pool of lines for its zone. When you walk into the zone, you get the line in the pool that has not been said yet, picked from the least-recently-spoken end. If you walk back through the same boundary later, you get a different line from the same pool. Lines have a 60-second floor before they can repeat. Two lines cannot start within 4 seconds of each other; the second one waits behind a cooldown instead of slamming the first one off the screen.</p>
-    <p>The reason this matters is small and important. You can wander now. Mission 1 has fourteen lines across its five zones; if you backtrack to the welcome wall after pulling the final lever, the AI says something it has not said yet, something that lands differently because you have seen the end. That is the kind of texture you cannot script. You can only set up the room and let the player find it.</p>
-
-    <figure class="post-figure post-figure-wide">
-      <img src="../assets/posts/day-24-m1-overview.png" alt="Mission 1 full overview. The whole horizontal data-hall level laid out: a dark blue night exterior on the left fading into a long corridor of server racks and walkways with cyan-tinted node-status screens, dim ground lighting, and the breaker-room silhouette high on the right." loading="lazy">
-      <figcaption>Mission 1 in one frame, after the art pass. Cyan node-status screens, server walls with bespoke detail, depth dimming so the foreground props sit forward. The first mission a new player ever sees.</figcaption>
+      <img src="../assets/posts/day-24-m3-pylon.png" alt="Mission 3 of Pull the Plug, the pylon-climb zone. Dark purple skyline, a tall lattice pylon in the middle of the frame, transmission cables stretched across the top, glowing cyan capacitor accents along the platforms." loading="lazy">
+      <figcaption>Mission 3, the pylon climb. The looming master pylon is the destination, visible from the first zone.</figcaption>
     </figure>
 
     <h2>Mission 1 got most of its art replaced</h2>
-    <p>The first mission is the one a new player sees first. It was also the one with the most placeholder art left in it. I spent a long session redoing it. Bespoke cyan data-center node-status screens at reception, the warehouse, the server zones. Server-wall and holo-display assets with proper glow bleed and depth-dim and contact shadows so the props sit forward instead of floating on the backdrop. The finale got rewritten too: pulling the main disconnect now triggers a small collapse cascade behind the lever, with three locked narrator lines as the lights die. The mission ends on something that feels like an act break, not a tutorial fade-out.</p>
+    <p>It is the first mission a new player sees, and it had the most placeholder art still in it. Bespoke data-center screens, server walls with proper depth, a real finale where pulling the disconnect triggers a small collapse cascade. It reads as a place now instead of a tutorial.</p>
 
-    <h2>The composition audit</h2>
-    <p>Some of the bigger ugly wins of the fortnight were not new content. They were a thing I started calling a composition audit. The procedure is dumb. I take the player's silhouette, treat him as a 1.8-metre ruler, then walk through every prop in every mission and ask whether it is the right size next to him. A server rack should be two metres. A wall display should be three. The kill-chain core tower should look like a building, not a desk. About half of the placed art across all missions was wrong, and the wrong scale is the difference between "this is a world" and "this is a tutorial."</p>
-    <p>I turned the procedure into a Claude skill so I could run it on a scene with one command. It snapshots the framed scene with the player in shot, measures everything against him, suggests fixes, and shows the before-and-after. The first round of fixes shipped on Mission 1 and Mission 5 and the look-and-feel difference is bigger than the new content was.</p>
-
-    <h2>Mission 4 finally stopped killing you for being rescued</h2>
-    <p>Mission 4 is the orbit one. Zero-G physics, a soft Karman line, the moment the narrator's calm starts to crack because the "calm room" metaphor stops working at 100 km altitude. It has been a buggy mission for weeks. This fortnight it got the polish it needed. The Phase-B zero-G layers were respaced from 200 to 550 pixels apart so the jump arc actually fits the gravity. The camera now follows the player tightly through the final zone instead of drifting and leaving him offscreen. The Apollo-Z5 checkpoint that was quietly missing for two weeks got added, which broke a death loop where the post-Karman rescue spawned you straight back into the kill zone. Small things. Together they make the mission playable end to end without needing the dev console.</p>
+    <h2>Mission 4 stopped killing you for being rescued</h2>
+    <p>Mission 4 is the orbit one with zero-G. A handful of long-standing bugs got fixed: the jump arc finally fits the gravity, the camera follows through the final zone, and a missing checkpoint was breaking a death loop. It is playable end to end now without dev shortcuts.</p>
 
     <h2>The first real playtest</h2>
-    <p>My girlfriend sat down on the couch with a controller and played the first three missions in one sitting. She had not seen any of this before. She had fun.</p>
+    <p>My girlfriend sat down on the couch with a controller and played the first three missions. She had not seen any of it before. She had fun. That is the only test that mattered this fortnight.</p>
 
     <figure class="post-figure post-figure-wide">
-      <img src="../assets/posts/day-24-gf-playthrough.webp" alt="A first-person view of the couch: hands holding a white PlayStation 5 DualSense controller connected to a MacBook by a teal USB-C cable. The laptop sits on a red blanket on someone's lap. On the screen, Mission 2 of Pull the Plug: the dark cave with a SURFACE marker label at the top, the water rising, the hooded player on a platform. A children's book sits on the couch beside them. A houseplant in the corner. Living room light." loading="lazy">
-      <figcaption>The first real playtest. Mission 2 on the screen, the rising water just below the SURFACE marker. A controller, a couch, somebody who has not been staring at the code for three weeks.</figcaption>
+      <img src="../assets/posts/day-24-gf-playthrough.webp" alt="A first-person view of the couch: hands on a PlayStation 5 controller connected to a MacBook by a teal cable. On the screen, Mission 2 of Pull the Plug — the dark cave with the SURFACE marker label at the top, the player on a platform near rising water. A children's book sits on the couch beside them." loading="lazy">
+      <figcaption>The first playtest. Controller, couch, somebody who has not been staring at the code for three weeks.</figcaption>
     </figure>
 
-    <p>This is the bit that does not show up in a commit log. The reason any of the previous fortnight matters is that somebody who is not me, who did not write this, can sit down and have a good time for an hour. The composition pass paid off; she did not stop to ask what a thing was supposed to be. The narrator zone-pool change paid off; she walked backward through a couple of zones and got new lines, which made her laugh. The bouncepad fix paid off; she trusted the pads. The water-kills-on-contact fix paid off; she died in Mission 2 the way she was supposed to die.</p>
-    <p>She did not get to Mission 4 yet. She will, soon, and I will know within a couple of evenings whether the moment the narrator cracks in orbit lands the way I want it to. That is the only test that matters.</p>
-
-    <h2>The small things</h2>
-    <p>God-mode key now exists, because I am tired of dying in Zone 6 of every mission while debugging the lever. Three taps of a hotkey turn off damage; three more turns it back on. A toggle to hide all checkpoints in editor mode, so I can read a mission's geometry without 30 little flags everywhere. Prelude prompts got bigger; the first-time player kept missing them. A pull-the-plug newspaper sprite I can drop with a hotkey for the epilogue's morning table. M3's Z7 exit warp pipe was floating in the void and is now sitting on a platform. M2's poison-plant hazards got swapped for bespoke caustic-coolant sumps because the cartoony plants were not pulling their weight.</p>
-    <p>None of these are good blog material on their own. Together they are most of the work of a real game. The last 10 percent of any level is 90 percent of the time.</p>
-
     <h2>What's next</h2>
-    <p>A real end-to-end playtest of all six missions in one sitting, with a notebook in my lap. The M6 build was structurally verified but I have not played the whole sequence yet at the right pace. The narrator's pacing changes were validated headlessly; whether the rhythm actually feels less abrupt in the chair is the question I cannot answer from a terminal.</p>
-    <p>Three queued follow-ups on Mission 6 that do not block playtesting. A bespoke crystal-core SVG to replace the placeholder. The data-storm overlay with about 80 flipping silhouettes for the 88-second hold. A real heartbeat sound and the DSP curve that takes the voice apart from fragmentation 1 to fragmentation 8. None of them are hard. All of them are next.</p>
-    <p>I keep waiting to feel like the game is done. It is the opposite. The closer it gets to playable the more I notice. That is probably the correct feeling.</p>
+    <p>A real end-to-end playtest of all six missions in one sitting, with a notebook in my lap. The polish queue for Mission 6 (bespoke crystal core, storm overlay, heartbeat audio) is the obvious next move. Then it is mostly tuning.</p>
   </article>
 
   <nav class="post-nav" aria-label="Post navigation">
