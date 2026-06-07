@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notes from the cooldown &mdash; Ermis Zacharopoulos</title>
+<meta name="description" content="Six days since Day 24. Pull the Plug went into cooldown. Eortes met a real phone, PodReddit grew a verification harness, No Rush is heading to the Play Store, Outside got a real map plus 728 Berlin playgrounds, and a Discord bot started buzzing my phone when the code does.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=2026-06-07-cooldown">
+<meta property="og:title" content="Notes from the cooldown">
+<meta property="og:description" content="Six days since Day 24. The game went quiet on purpose. The other four projects took the floor.">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://ennui92.github.io/ermis-dev/assets/posts/day-24-gf-playthrough.webp">
+<meta property="og:url" content="https://ennui92.github.io/ermis-dev/posts/notes-from-the-cooldown.html">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<main class="post">
+  <p class="post-back"><a href="../#posts">&larr; Posts</a></p>
+
+  <article>
+    <header class="post-head">
+      <p class="post-meta">7 June 2026 &middot; Diary</p>
+      <h1>Notes from the cooldown</h1>
+      <p class="post-lede">Six days since Day 24. Pull the Plug has been quiet on purpose. The other projects took the floor.</p>
+    </header>
+
+    <aside class="post-disclaimer">
+      <p><strong>Small disclaimer before you read.</strong> Same as the last few posts: I asked Claude to assemble these notes from my git logs and commit messages, in the tone of voice it could pick up from my podcast. Read at your own risk. If you have questions about any of this, ask me and I promise to answer with my actual brain.</p>
+    </aside>
+
+    <h2>Pull the Plug went into cooldown</h2>
+    <p>Two PRs landed on June 1. The player keeps <code>RUN_SPEED</code> across a jump now; only stopping resets you to Walk. That fixed the "felt floaty" note from the couch playtest. And there is a cumulative timer on the mission-end card, so a playthrough finally feels like one thing instead of six.</p>
+    <p>Then the laptop closed on the game for a week. Playtest cooldown is a real cost I had not budgeted for.</p>
+
+    <h2>Eortes met a real device</h2>
+    <p>The app went on a phone. Then the device started telling me things.</p>
+    <p>The first tap on Search was slow because a 990-name Greek-locale sort was running the first time anyone opened the screen. Bell toggles on the People list took two seconds, because every mutation awaited <code>rescheduleAll()</code>: cancel ~120 alarms, reschedule ~120 alarms, in series, before the UI updated. The Android calendar-add was crashing through a multi-year SDK bug that needed a <code>patch-package</code> monkeypatch on <code>expo-intent-launcher</code>. All three fixed.</p>
+    <p>A Settings screen also showed up that I had not planned. The reminder time was hard-coded to 09:00. The wish message fired instantly with no preview, which on Viber is irreversible. Editable preview before sending. Saved template with a <code>{name}</code> placeholder. A per-contact "remind me to send the wish" toggle. Things you only put in when someone you know is about to use this.</p>
+    <p><strong>Three version bumps in one Friday.</strong> Most of it is invisible. That is the gig.</p>
+
+    <h2>PodReddit grew a verification harness</h2>
+    <p>The Reddit-ads pipeline for the podcast had a bad week before this one. A 401 silently killed every webhook for a day because <code>verify_jwt</code> drifted on a deploy. The daily digest stopped fanning out for days because a jitter setting was bigger than its cron's runtime, so every dispatcher timed out before sending. An ad that Reddit was just slow to approve got auto-deleted by a cleanup job that assumed pending-for-five-days meant dead.</p>
+    <p>The pattern was the same in every case. The failure was silent. The silence was the worst part.</p>
+    <p>So this week was the verification harness. A script that asserts the invariants whose silent breakage caused the churn. Every public function reachable unauthenticated. Every critical cron has a recent successful run. The jitter is smaller than the runtime. No campaign stuck mid-launch. It exits non-zero on any failure and gates the deploy. Then the same checks run as an edge function on a 4-hour watchdog cron, Telegrams me on any fail, stays silent when healthy.</p>
+    <p>Plus a behavioral check that actually invokes the digest end to end for one tenant and asserts the message landed on Telegram, email, and Discord. The thing the existing crons could not catch.</p>
+    <p><strong>Run this before declaring any pipeline change done.</strong> That note is in <code>PROJECT_NOTES</code> now, in caps.</p>
+
+    <h2>No Rush is going to the Play Store</h2>
+    <p>The PWA install banner kept nagging people who already had the app installed, because <code>display-mode: standalone</code> is false the moment they open the same link from a regular browser tab. Now the install detection uses <code>navigator.getInstalledRelatedApps()</code> against the manifest's <code>related_applications</code>. The banner goes away when the app is actually there.</p>
+    <p>The more honest reason for the Play Store: the install-to-home-screen dance has too many steps. The Play Store has one button. The TWA scaffold is in. Bubblewrap config, <code>assetlinks.json</code> served from <code>app.norush.chat</code>, the runbook for the first upload. The TWA loads the live site, so web deploys keep updating the app instantly. The Play Console is just the shell.</p>
+
+    <h2>Outside got a map and 728 playgrounds</h2>
+    <p>A new project on the pile. A mobile app for parents in Berlin: pick a park or a playground, broadcast "we're going" to a small circle of friend families, watch them join. Family-scoped, not public. It is called Outside.</p>
+    <p>It already existed on Firebase. A week or two ago it got rewritten under itself onto Supabase: Postgres with RLS gated by family membership, Edge Functions for the push fanout. This week was the catch-up. Bring the Berlin curated data, the Android EAS workflow, and the handoff doc forward from the Firebase branches that will not be making the trip.</p>
+    <p>The map also got real. The old MapPreview rendered a Static Maps image and bounced you out to Google Maps on tap, where Google read the landmark name as a search query and surfaced flea markets and bus stops sharing the name. Replaced with an interactive <code>react-native-maps</code> MapView, a coral marker locked to the actual coordinates, and a small "&uarr;&nearr; Directions" button if you actually want turn-by-turn.</p>
+    <p><strong>728 landmarks for Berlin seeded from OpenStreetMap</strong>: 355 playgrounds, 373 parks. Names ending in "platz" got filtered (memorial squares, not real parks), so did the FKK areas, so did the bare-generic "Spielplatz" and "Park". The curated 111 still take priority on collisions. Data &copy; OpenStreetMap contributors.</p>
+
+    <h2>A bot that buzzes my phone when the code does</h2>
+    <p>Today's tiny one. A Node process on my laptop takes a <code>POST /notify</code> and DMs me on Discord. Useful because Discord push is good on a phone and works on desktop too, so I get one buzz instead of plumbing three different notification systems into every project. Five hours old.</p>
+    <p>Slash commands too. <code>/log &lt;project&gt; &lt;message&gt;</code> writes a quick note to <code>data/log.json</code> on the laptop, <code>/recent &lt;project&gt;</code> reads the last ten back. The next step is wiring it into every project's deploy and build hook, so my phone tells me when staging is up before I have to ask.</p>
+  </article>
+
+  <nav class="post-nav" aria-label="Post navigation">
+    <a class="post-nav-prev" href="pull-the-plug-day-24.html">
+      <span class="post-nav-label">&larr; Previous</span>
+      <span class="post-nav-title">Day 24: the end is built</span>
+    </a>
+    <a class="post-nav-index" href="./">All posts</a>
+  </nav>
+
+  <section class="comments" aria-labelledby="comments-heading" data-post-id="notes-from-the-cooldown">
+    <h2 id="comments-heading">Comments</h2>
+    <p class="comments-intro">Anyone can post. Captcha keeps the bots out. No links allowed.</p>
+
+    <ul class="comment-list" id="comment-list" aria-live="polite">
+      <li class="comment-loading">Loading comments&hellip;</li>
+    </ul>
+
+    <form class="comment-form" id="comment-form" novalidate>
+      <div class="comment-honeypot" aria-hidden="true">
+        <label for="comment-website">Website (leave blank)</label>
+        <input type="text" id="comment-website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="comment-field">
+        <label for="comment-name">Name <span class="comment-hint">(optional)</span></label>
+        <input type="text" id="comment-name" name="name" maxlength="40" autocomplete="off" placeholder="Anonymous">
+      </div>
+
+      <div class="comment-field">
+        <label for="comment-body">Comment</label>
+        <textarea id="comment-body" name="body" rows="6" maxlength="800" required placeholder="Say something. No links."></textarea>
+        <p class="comment-counter"><span id="comment-counter">0</span> / 800</p>
+      </div>
+
+      <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="light"></div>
+
+      <div class="comment-actions">
+        <button type="submit" id="comment-submit">Post comment</button>
+        <p class="comment-status" id="comment-status" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+
+    <noscript>
+      <p class="comments-fallback">Comments need JavaScript. Email me via the link in the footer instead.</p>
+    </noscript>
+  </section>
+
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script src="../assets/comments.js?v=2026-06-07-cooldown" defer></script>
+
+  <footer>
+    <ul class="socials">
+      <li><a href="../">&larr; ermis.dev</a></li>
+      <li><a href="https://www.linkedin.com/in/ermis-zacharopoulos-2819968b/" target="_blank" rel="noopener">LinkedIn</a></li>
+      <li><a href="https://github.com/Ennui92" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <p class="meta">Ermis Zacharopoulos &middot; Berlin</p>
+  </footer>
+</main>
+</body>
+</html>
