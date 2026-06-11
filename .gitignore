@@ -8,3 +8,8 @@ desktop.ini
 .idea/
 *.swp
 *~
+
+# Local-only working material — drafts, scratch notes, anything not meant to ship
+drafts/
+NOTES.local.md
+*.local.md
