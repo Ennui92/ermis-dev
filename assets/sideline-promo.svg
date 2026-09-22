@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 360" role="img" aria-labelledby="t">
+  <title id="t">Sideline: a marathon course folded like a snake, with friends' faces along it and the finished stretch in green</title>
+  <rect width="880" height="360" rx="28" fill="#FFF4E3"/>
+  <circle cx="800" cy="40" r="120" fill="#FFF0C9"/>
+  <circle cx="60" cy="330" r="90" fill="#FFE0D5"/>
+
+  <g transform="translate(470 40)">
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M40 40 H300 A45 45 0 0 1 300 130 H40 A45 45 0 0 0 40 220 H300 A45 45 0 0 1 300 310 H50" stroke="#21160E" stroke-width="33"/>
+      <path d="M40 40 H300 A45 45 0 0 1 300 130 H40 A45 45 0 0 0 40 220 H300 A45 45 0 0 1 300 310 H50" stroke="#FFFFFF" stroke-width="27"/>
+      <path d="M40 40 H300 A45 45 0 0 1 300 130 H170" stroke="#1FA97B" stroke-width="27"/>
+      <path d="M90 220 H230" stroke="#FFF0C9" stroke-width="27"/>
+    </g>
+    <circle cx="40" cy="40" r="7" fill="#21160E"/>
+    <g stroke="#FFFFFF" stroke-width="4">
+      <circle cx="105" cy="40" r="23" fill="#4C7DF0"/>
+      <circle cx="245" cy="40" r="23" fill="#E8386D"/>
+      <circle cx="90" cy="130" r="23" fill="#F2B705"/>
+      <circle cx="270" cy="220" r="23" fill="#7C5CF0"/>
+      <circle cx="170" cy="310" r="23" fill="#1FA97B"/>
+    </g>
+    <circle cx="170" cy="130" r="29" fill="#F0522B" stroke="#21160E" stroke-width="3"/>
+    <circle cx="170" cy="123" r="9" fill="#FFE0D5"/>
+    <path d="M155 145 q15 -15 30 0" fill="#FFE0D5"/>
+    <circle cx="295" cy="40" r="10" fill="#1FA97B" stroke="#fff" stroke-width="2"/>
+    <path d="M290 40 l4 4 l6 -7" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M50 310 V282" stroke="#21160E" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M50 282 L70 289 L50 296 Z" fill="#F0522B" stroke="#21160E" stroke-width="2" stroke-linejoin="round"/>
+  </g>
+
+  <g font-family="Gabarito, Figtree, -apple-system, Segoe UI, sans-serif" fill="#21160E">
+    <text x="56" y="150" font-size="78" font-weight="900" letter-spacing="-2">Sideline</text>
+    <text x="58" y="202" font-size="27" font-weight="800" fill="#5C4A39">Get your people to</text>
+    <text x="58" y="236" font-size="27" font-weight="800" fill="#5C4A39">the right kilometre.</text>
+    <rect x="58" y="270" width="186" height="40" rx="20" fill="#F0522B" stroke="#21160E" stroke-width="2.5"/>
+    <text x="151" y="297" font-size="18" font-weight="800" fill="#FFFFFF" text-anchor="middle">Live on the web</text>
+  </g>
+</svg>
