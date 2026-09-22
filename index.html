@@ -13,7 +13,7 @@
 <meta property="og:title" content="Ermis Zacharopoulos">
 <meta property="og:description" content="Podcasts, writing, drawing, code. Based in Berlin.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://ermis.dev">
+<meta property="og:url" content="https://ennui92.github.io/ermis-dev/">
 <meta name="twitter:card" content="summary">
 </head>
 <body>
@@ -23,6 +23,35 @@
     <p class="tagline">Berlin. Podcasts, writing, drawing, code.</p>
     <p class="intro">A list of the things I make and where to find them, in case you are interested or I die. Or both.</p>
   </header>
+
+  <!-- Jump to a section without scrolling past everything else. Sticky, and
+       the section you are reading lights up. -->
+  <nav class="jump" aria-label="Jump to a section">
+    <a href="#new">New</a>
+    <a href="#code">Code</a>
+    <a href="#podcasts">Podcasts</a>
+    <a href="#posts">Posts</a>
+    <a href="#writing">Writing</a>
+    <a href="#drawing">Drawing</a>
+    <a href="#subscribe">Subscribe</a>
+  </nav>
+
+  <section id="new" aria-labelledby="new-heading">
+    <h2 id="new-heading">New</h2>
+    <article class="project project-featured">
+      <img src="assets/sideline-promo.svg" alt="Sideline: a marathon course folded like a snake, with friends' faces along it and the finished stretch in green." class="project-image-banner" loading="lazy">
+      <header class="project-head">
+        <p class="post-meta">Started September 2026 &middot; Live on the web</p>
+        <h3>Sideline: get your people to the right kilometre</h3>
+        <p>A marathon is a very long way to run on your own. Sideline lets a runner's friends see the whole course, pick a spot, say what they are bringing and follow the runner live, with one chat and one photo wall for the day. Friends who can't be there can follow from home. Built for the Berlin Marathon. Android and iPhone apps are coming.</p>
+      </header>
+      <ul class="links">
+        <li><a href="https://sideline-ermis.web.app" target="_blank" rel="noopener">Open the app</a></li>
+        <li><a href="https://ennui92.github.io/sideline-site/" target="_blank" rel="noopener">Project page</a></li>
+        <li><a href="https://ennui92.github.io/sideline-site/#waitlist" target="_blank" rel="noopener">Join the app waitlist</a></li>
+      </ul>
+    </article>
+  </section>
 
   <section id="subscribe" aria-labelledby="subscribe-heading" class="subscribe">
     <h2 id="subscribe-heading">Subscribe</h2>
@@ -107,6 +136,7 @@
     <article class="project">
       <img src="assets/sideline-promo.svg" alt="Sideline: a marathon course folded like a snake, with friends' faces along it and the finished stretch in green." class="project-image-banner" loading="lazy">
       <header class="project-head">
+        <p class="post-meta"><time datetime="2026-09-02">Started September 2026</time></p>
         <h3>Sideline: get your people to the right kilometre</h3>
         <p>A marathon is a very long way to run on your own. Sideline lets a runner's friends see the whole course, pick a spot, say what they are bringing and follow the runner live, with one chat and one photo wall for the day. Built for the Berlin Marathon. Live on the web now, Android and iPhone apps coming.</p>
       </header>
@@ -116,23 +146,21 @@
         <li><a href="https://ennui92.github.io/sideline-site/#waitlist" target="_blank" rel="noopener">Join the app waitlist</a></li>
       </ul>
     </article>
-
     <article class="project">
-      <img src="assets/pull-the-plug-promo.png" alt="Pull the Plug — Mission 1 overview. A long horizontal data-hall level with server racks, cyan node-status screens, and the breaker room high on the right." class="project-image" loading="lazy">
+      <img src="assets/eortes-promo.png" alt="Eortes — the Today screen. A parchment background showing the date 'Κυριακή 31 Μαΐου', a green Κατάλυση (fast-free) pill, the names celebrating, and a row of name chips below." class="project-image-phone" loading="lazy">
       <header class="project-head">
-        <h3>Pull the Plug &mdash; a one-button climb against a narrator that's losing it</h3>
-        <p>A 2D vector one-button climber for Steam, iOS, and Android. Six pieces of AI infrastructure, one mission each, one off-switch at the top. The narrator is the AI you are trying to shut down. It starts calm. It does not stay calm. Playable work-in-progress on phone or desktop.</p>
+        <p class="post-meta"><time datetime="2026-05-31">Started May 2026</time></p>
+        <h3>Eortes &mdash; Greek name-days and fasting, done right</h3>
+        <p>A bilingual Greek Orthodox name-day and fasting app for the diaspora and Greece. No backend &mdash; the calendar is computed on the phone from the date of Pascha, so it cannot rot the way every other εορτολόγιο app eventually does. Offline. No ads. One small payment unlocks reminders. App Store and Play Store soft-launch coming.</p>
       </header>
       <ul class="links">
-        <li><a href="https://ennui92.github.io/pull-the-plug-site/" target="_blank" rel="noopener">Project page</a></li>
-        <li><a href="https://pull-the-plug.feepok.workers.dev" target="_blank" rel="noopener">Play the work-in-progress</a></li>
-        <li><a href="posts/pull-the-plug-day-24.html">Latest devlog</a></li>
+        <li><a href="posts/eortes-day-one.html">Read the intro post</a></li>
       </ul>
     </article>
-
     <article class="project">
       <img src="assets/no-rush-promo.svg" alt="No Rush — a calm parchment-toned banner with a single green dot above the wordmark and the tagline 'It's okay to not be available.'" class="project-image-banner" loading="lazy">
       <header class="project-head">
+        <p class="post-meta"><time datetime="2026-05-26">Started May 2026</time></p>
         <h3>No Rush &mdash; the slow encrypted messenger</h3>
         <p>A calm encrypted messenger. No push, no badge, no green dot, no read receipts. From Berlin. Live prototype you can install to your home screen and take for a spin. Free. The code goes open.</p>
       </header>
@@ -142,21 +170,23 @@
         <li><a href="posts/no-rush-day-one.html">Read the intro post</a></li>
       </ul>
     </article>
-
     <article class="project">
-      <img src="assets/eortes-promo.png" alt="Eortes — the Today screen. A parchment background showing the date 'Κυριακή 31 Μαΐου', a green Κατάλυση (fast-free) pill, the names celebrating, and a row of name chips below." class="project-image-phone" loading="lazy">
+      <img src="assets/pull-the-plug-promo.png" alt="Pull the Plug — Mission 1 overview. A long horizontal data-hall level with server racks, cyan node-status screens, and the breaker room high on the right." class="project-image" loading="lazy">
       <header class="project-head">
-        <h3>Eortes &mdash; Greek name-days and fasting, done right</h3>
-        <p>A bilingual Greek Orthodox name-day and fasting app for the diaspora and Greece. No backend &mdash; the calendar is computed on the phone from the date of Pascha, so it cannot rot the way every other εορτολόγιο app eventually does. Offline. No ads. One small payment unlocks reminders. App Store and Play Store soft-launch coming.</p>
+        <p class="post-meta"><time datetime="2026-05-08">Started May 2026</time></p>
+        <h3>Pull the Plug &mdash; a one-button climb against a narrator that's losing it</h3>
+        <p>A 2D vector one-button climber for Steam, iOS, and Android. Six pieces of AI infrastructure, one mission each, one off-switch at the top. The narrator is the AI you are trying to shut down. It starts calm. It does not stay calm. Playable work-in-progress on phone or desktop.</p>
       </header>
       <ul class="links">
-        <li><a href="posts/eortes-day-one.html">Read the intro post</a></li>
+        <li><a href="https://ennui92.github.io/pull-the-plug-site/" target="_blank" rel="noopener">Project page</a></li>
+        <li><a href="https://pull-the-plug.feepok.workers.dev" target="_blank" rel="noopener">Play the work-in-progress</a></li>
+        <li><a href="posts/pull-the-plug-day-24.html">Latest devlog</a></li>
       </ul>
     </article>
-
     <article class="project">
       <img src="assets/fair-rating-promo.png" alt="Fair Rating — Truer Google Maps ratings for German businesses" class="project-image" width="440" height="280" loading="lazy">
       <header class="project-head">
+        <p class="post-meta"><time datetime="2026-04-24">Started April 2026</time></p>
         <h3>Fair Rating &mdash; German Review Removal Adjuster</h3>
         <p>A Chrome extension that fixes Google Maps ratings for businesses that have mass-removed negative reviews under German defamation law. Reads Google's own disclosure, recalculates the rating, shows it as a badge.</p>
       </header>
@@ -167,10 +197,10 @@
         <li><a href="https://github.com/Ennui92/fair-rating-extension" target="_blank" rel="noopener">Source on GitHub</a></li>
       </ul>
     </article>
-
     <article class="project">
       <img src="assets/tabnoodle-promo.png" alt="TabNoodle — One clean browser, one click." class="project-image" width="440" height="280" loading="lazy">
       <header class="project-head">
+        <p class="post-meta"><time datetime="2026-04-11">Started April 2026</time></p>
         <h3>TabNoodle &mdash; One-click tab cleanup</h3>
         <p>A Chrome extension that scores every open tab, auto-groups the keepers, and lets you swipe the rest away. Close the noise, keep the signal &mdash; private by default, all data stays in your browser.</p>
       </header>
@@ -227,5 +257,29 @@
     <p class="meta">Ermis Zacharopoulos · Berlin</p>
   </footer>
 </main>
+<script>
+// Light up the pill for the section on screen. Links work without this.
+(function () {
+  var links = [].slice.call(document.querySelectorAll(".jump a"));
+  if (!("IntersectionObserver" in window) || !links.length) return;
+  var byId = {};
+  links.forEach(function (a) { byId[a.getAttribute("href").slice(1)] = a; });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.classList.remove("is-active"); });
+      var a = byId[e.target.id];
+      if (a) {
+        a.classList.add("is-active");
+        a.scrollIntoView({ block: "nearest", inline: "nearest" });
+      }
+    });
+  }, { rootMargin: "-45% 0px -50% 0px" });
+  Object.keys(byId).forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) io.observe(el);
+  });
+})();
+</script>
 </body>
 </html>

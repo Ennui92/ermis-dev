@@ -906,3 +906,51 @@ main .post-back { margin-bottom: 16px; }
   clip: rect(0,0,0,0);
   border: 0;
 }
+
+/* ============================================================
+   JUMP PILLS: get to a section without scrolling past the rest.
+   Sticky under the hero, swipeable sideways on a phone.
+   ============================================================ */
+.jump {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 10px 2px;
+  margin: 0 -2px 8px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  -webkit-overflow-scrolling: touch;
+}
+.jump::-webkit-scrollbar { display: none; }
+.jump a {
+  flex: 0 0 auto;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text);
+  background: var(--pill-bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px 14px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.jump a:hover,
+.jump a:focus-visible { border-color: var(--accent); }
+.jump a.is-active {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+/* Headings land below the sticky pills, not under them. */
+main > section { scroll-margin-top: 64px; }
+
+/* The one new thing, lifted slightly off the page. */
+.project-featured {
+  border: 2px solid var(--accent);
+  box-shadow: var(--shadow-lift);
+}
